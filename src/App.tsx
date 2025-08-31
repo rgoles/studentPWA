@@ -6,37 +6,38 @@ import { Label } from "./components/ui/label";
 type Shift = {
   shiftStart: string;
   shiftEnd: string;
-  totalHours: string;
+  totalHours: {
+    hours: number;
+    minutes: number;
+    decimalHours: number;
+  };
 };
 
 function App() {
   const [shift, setShift] = useState<Shift>({
     shiftStart: "00:00",
     shiftEnd: "00:00",
-    totalHours: "0",
+    totalHours: {
+      hours: 0,
+      minutes: 0,
+      decimalHours: 0,
+    },
   });
 
-  // TODO: Extract this function, rework it or "optimize" it
   const calcTotalHoursWorkedFunc = (startShift: string, endShift: string) => {
-    let totalHours = 0;
-    let totalMinutes = 0;
-    let finalCalc = "";
+    const [sh, sm] = startShift.split(":").map(Number);
+    const [eh, em] = endShift.split(":").map(Number);
 
-    const start = startShift.split(":");
-    const end = endShift.split(":");
+    const startMin = sh * 60 + sm;
+    let endMin = eh * 60 + em;
 
-    console.log(start);
-    console.log(end);
+    if (endMin < startMin) endMin += 24 * 60;
 
-    // pretvorba u minute
-    totalHours = (Number(end[0]) - Number(start[0])) * 60;
-
-    // TODO: This is a "bug" because i cannot do 00 - 30 since its -30 in mins i need some other way to calculate it
-    totalMinutes = Number(end[1]) - Number(start[1]);
-
-    finalCalc = String(totalHours) + ":" + String(totalMinutes);
-
-    return finalCalc;
+    const totalMinutes = endMin - startMin;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const decimalHours = Math.round((totalMinutes / 60) * 100) / 100;
+    return { hours, minutes, decimalHours };
   };
 
   const onSubmitFunc = (e: React.FormEvent<HTMLFormElement>) => {
@@ -89,7 +90,7 @@ function App() {
         />
         <Button type="submit">Submit</Button>
       </form>
-      {shift.totalHours}
+      {shift.totalHours.hours + ":" + shift.totalHours.minutes}
     </div>
   );
 }
