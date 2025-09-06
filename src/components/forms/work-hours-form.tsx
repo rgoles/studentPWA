@@ -57,7 +57,7 @@ export const WorkHoursForm = () => {
 
     const calculatedTotalHours = calculateShiftDuration(
       shift.shiftStart,
-      shift.shiftEnd
+      shift.shiftEnd,
     );
 
     setShift({
@@ -79,39 +79,45 @@ export const WorkHoursForm = () => {
   };
 
   return (
-    <div className="flex w-full max-h-full h-[80dvh] justify-center items-center">
+    <div className="mt-5 flex w-full flex-col items-center justify-center">
       <form
-        className="flex gap-2 w-xs justify-center items-center flex-col mt-8"
+        className="flex w-full flex-col items-start justify-center gap-2.5 md:w-xs"
         onSubmit={onSubmitFunc}
       >
-        <Label htmlFor="shiftStart">Shift Start</Label>
-        <Input
-          type="time"
-          placeholder="Shift Start"
-          name="shiftStart"
-          value={shift.shiftStart}
-          onChange={(e) =>
-            setShift({
-              ...shift,
-              shiftStart: e.target.value,
-            })
-          }
-        />
-        <Label htmlFor="shiftEnd">Shift End</Label>
-        <Input
-          type="time"
-          placeholder="Shift End"
-          name="shiftEnd"
-          value={shift.shiftEnd}
-          onChange={(e) =>
-            setShift({
-              ...shift,
-              shiftEnd: e.target.value,
-            })
-          }
-        />
+        <div className="grid w-full grid-cols-6 space-y-2 space-x-4">
+          <div className="col-span-3 space-y-2">
+            <Label htmlFor="shiftStart">Shift Start</Label>
+            <Input
+              type="time"
+              placeholder="Shift Start"
+              name="shiftStart"
+              value={shift.shiftStart}
+              onChange={(e) =>
+                setShift({
+                  ...shift,
+                  shiftStart: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div className="col-span-3 space-y-2">
+            <Label htmlFor="shiftEnd">Shift End</Label>
+            <Input
+              type="time"
+              placeholder="Shift End"
+              name="shiftEnd"
+              value={shift.shiftEnd}
+              onChange={(e) =>
+                setShift({
+                  ...shift,
+                  shiftEnd: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col space-y-2">
           <Label htmlFor="date-picker" className="px-1">
             Date
           </Label>
@@ -145,7 +151,9 @@ export const WorkHoursForm = () => {
             </PopoverContent>
           </Popover>
         </div>
-        <Button type="submit">Submit</Button>
+        <Button className="w-full" type="submit">
+          Submit
+        </Button>
       </form>
       {shift.totalHours.hours + ":" + shift.totalHours.minutes}
       {shift.date.toLocaleDateString()}

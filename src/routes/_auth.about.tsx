@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { signOutFunction } from "@/auth/index";
 import { auth } from "@/config/firebase";
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/_auth/about")({
   component: About,
 });
 

@@ -9,33 +9,26 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
-import { app } from "@/config/firebase";
+import { useContext, useState } from "react";
+import { AuthContext, registerWithEmailAndPassword } from "@/auth";
+import { Link } from "@tanstack/react-router";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const auth = getAuth(app);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const { isSignedIn } = useContext(AuthContext);
+  console.log(isSignedIn ? "User is signed in" : "User is not signed in");
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up
-        const user = userCredential.user;
-        console.log(user);
-        setError("");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        setError(errorMessage);
-      });
+
+    const { user, error } = await registerWithEmailAndPassword(email, password);
+    if (error) setError(error);
+    else console.log("Logged in:", user);
   };
 
   return (
@@ -90,9 +83,9 @@ export function RegisterForm({
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              <a href="/register" className="underline underline-offset-4">
+              <Link to="/login" className="underline underline-offset-4">
                 Login
-              </a>
+              </Link>
             </div>
           </form>
         </CardContent>

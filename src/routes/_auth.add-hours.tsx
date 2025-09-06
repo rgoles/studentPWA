@@ -1,7 +1,7 @@
 import { WorkHoursForm } from "@/components/forms/work-hours-form";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/add-hours")({
+export const Route = createFileRoute("/_auth/add-hours")({
   component: RouteComponent,
 });
 

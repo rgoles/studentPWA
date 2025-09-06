@@ -11,9 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AddHoursRouteImport } from './routes/add-hours'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as AuthIndexRouteImport } from './routes/_auth.index'
+import { Route as AuthAddHoursRouteImport } from './routes/_auth.add-hours'
+import { Route as AuthAboutRouteImport } from './routes/_auth.about'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -25,56 +26,66 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AddHoursRoute = AddHoursRouteImport.update({
-  id: '/add-hours',
-  path: '/add-hours',
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAddHoursRoute = AuthAddHoursRouteImport.update({
+  id: '/add-hours',
+  path: '/add-hours',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAboutRoute = AuthAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/add-hours': typeof AddHoursRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/about': typeof AuthAboutRoute
+  '/add-hours': typeof AuthAddHoursRoute
+  '/': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/add-hours': typeof AddHoursRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/about': typeof AuthAboutRoute
+  '/add-hours': typeof AuthAddHoursRoute
+  '/': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/add-hours': typeof AddHoursRoute
+  '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_auth/about': typeof AuthAboutRoute
+  '/_auth/add-hours': typeof AuthAddHoursRoute
+  '/_auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/add-hours' | '/login' | '/register'
+  fullPaths: '/login' | '/register' | '/about' | '/add-hours' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/add-hours' | '/login' | '/register'
-  id: '__root__' | '/' | '/about' | '/add-hours' | '/login' | '/register'
+  to: '/login' | '/register' | '/about' | '/add-hours' | '/'
+  id:
+    | '__root__'
+    | '/_auth'
+    | '/login'
+    | '/register'
+    | '/_auth/about'
+    | '/_auth/add-hours'
+    | '/_auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  AddHoursRoute: typeof AddHoursRoute
+  AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
 }
@@ -95,34 +106,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/add-hours': {
-      id: '/add-hours'
-      path: '/add-hours'
-      fullPath: '/add-hours'
-      preLoaderRoute: typeof AddHoursRouteImport
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_auth/': {
+      id: '/_auth/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/add-hours': {
+      id: '/_auth/add-hours'
+      path: '/add-hours'
+      fullPath: '/add-hours'
+      preLoaderRoute: typeof AuthAddHoursRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/about': {
+      id: '/_auth/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AuthAboutRouteImport
+      parentRoute: typeof AuthRoute
     }
   }
 }
 
+interface AuthRouteChildren {
+  AuthAboutRoute: typeof AuthAboutRoute
+  AuthAddHoursRoute: typeof AuthAddHoursRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthAboutRoute: AuthAboutRoute,
+  AuthAddHoursRoute: AuthAddHoursRoute,
+  AuthIndexRoute: AuthIndexRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  AddHoursRoute: AddHoursRoute,
+  AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
 }
