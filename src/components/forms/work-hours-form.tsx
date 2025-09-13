@@ -11,17 +11,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/config/firebase";
-
-type Shift = {
-  shiftStart: string;
-  shiftEnd: string;
-  totalHours: {
-    hours: number;
-    minutes: number;
-    decimalHours: number;
-  };
-  date: Date;
-};
+import { useAuth } from "@/auth";
+import { calculateShiftDuration } from "@/lib/calculate-shift-duration";
+import type { Shift } from "@/types";
 
 export const WorkHoursForm = () => {
   const [open, setOpen] = useState(false);
@@ -36,21 +28,8 @@ export const WorkHoursForm = () => {
     date: new Date(),
   });
 
-  const calculateShiftDuration = (startShift: string, endShift: string) => {
-    const [sh, sm] = startShift.split(":").map(Number);
-    const [eh, em] = endShift.split(":").map(Number);
-
-    const startMin = sh * 60 + sm;
-    let endMin = eh * 60 + em;
-
-    if (endMin < startMin) endMin += 24 * 60;
-
-    const totalMinutes = endMin - startMin;
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    const decimalHours = Math.round((totalMinutes / 60) * 100) / 100;
-    return { hours, minutes, decimalHours };
-  };
+  const { user } = useAuth();
+  const uid = user.uid;
 
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,19 +39,19 @@ export const WorkHoursForm = () => {
       shift.shiftEnd,
     );
 
-    setShift({
+    const payload = {
       ...shift,
       totalHours: calculatedTotalHours,
-    });
-    const { shiftStart, shiftEnd, totalHours, date } = shift;
+    };
+    setShift(payload);
+
     try {
-      const docRef = await addDoc(collection(db, "users/test-user/shifts"), {
-        shiftStart: shiftStart,
-        shiftEnd: shiftEnd,
-        totalHours: totalHours,
-        date: date,
-      });
+      const docRef = await addDoc(
+        collection(db, "users", uid, "shifts"),
+        payload,
+      );
       console.log("Document written with ID: ", docRef.id);
+      console.log("Saved payload:", payload);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -84,8 +63,8 @@ export const WorkHoursForm = () => {
         className="flex w-full flex-col items-start justify-center gap-2.5 md:w-xs"
         onSubmit={onSubmitFunc}
       >
-        <div className="grid w-full grid-cols-6 space-y-2 space-x-4">
-          <div className="col-span-3 space-y-2">
+        <div className="grid w-full grid-cols-4 gap-2">
+          <div className="col-span-2 space-y-2">
             <Label htmlFor="shiftStart">Shift Start</Label>
             <Input
               type="time"
@@ -100,7 +79,7 @@ export const WorkHoursForm = () => {
               }
             />
           </div>
-          <div className="col-span-3 space-y-2">
+          <div className="col-span-2 space-y-2">
             <Label htmlFor="shiftEnd">Shift End</Label>
             <Input
               type="time"
@@ -155,8 +134,8 @@ export const WorkHoursForm = () => {
           Submit
         </Button>
       </form>
-      {shift.totalHours.hours + ":" + shift.totalHours.minutes}
-      {shift.date.toLocaleDateString()}
+      <p>Total: {shift.totalHours.hours + ":" + shift.totalHours.minutes}</p>
+      <p>{shift.date.toLocaleDateString()}</p>
     </div>
   );
 };

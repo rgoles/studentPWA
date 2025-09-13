@@ -7,13 +7,13 @@ import {
 
 export const registerWithEmailAndPassword = async (
   email: string,
-  password: string
+  password: string,
 ) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     return { user: userCredential.user, error: null };
   } catch (err: any) {
@@ -23,13 +23,13 @@ export const registerWithEmailAndPassword = async (
 
 export const loginWithEmailAndPassword = async (
   email: string,
-  password: string
+  password: string,
 ) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     return { user: userCredential.user, error: null };
   } catch (err: any) {

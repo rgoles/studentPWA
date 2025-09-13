@@ -8,25 +8,33 @@ import {
 } from "react";
 import { auth } from "@/config/firebase"; // <-- use initialized instance
 
-export type AuthContextType = {
+export type User = {
+  [key: string]: any; // keys are strings, values can be anything
+};
+
+export interface AuthContextType {
   isSignedIn: boolean;
   isInitialLoading: boolean;
-};
+  user: User;
+}
 
 const AuthContext = createContext<AuthContextType>({
   isSignedIn: false,
   isInitialLoading: true,
+  user: {},
 });
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       setIsSignedIn(!!user);
       setIsInitialLoading(false);
       if (user) {
+        setUser(user);
         console.log(user.uid);
         console.log("signed in");
       } else console.log("not");
@@ -35,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isSignedIn, isInitialLoading }}>
+    <AuthContext.Provider value={{ isSignedIn, isInitialLoading, user }}>
       {children}
     </AuthContext.Provider>
   );

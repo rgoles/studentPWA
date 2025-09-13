@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useContext, useState } from "react";
-import { AuthContext, registerWithEmailAndPassword } from "@/auth";
+import { useState } from "react";
+import { registerWithEmailAndPassword, useAuth } from "@/auth";
 import { Link } from "@tanstack/react-router";
 
 export function RegisterForm({
@@ -21,7 +21,7 @@ export function RegisterForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const { isSignedIn } = useContext(AuthContext);
+  const { isSignedIn } = useAuth();
   console.log(isSignedIn ? "User is signed in" : "User is not signed in");
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,7 +91,7 @@ export function RegisterForm({
         </CardContent>
       </Card>
       {error && (
-        <div className="text-red-500 text-center text-xs text-balance">
+        <div className="text-center text-xs text-balance text-red-500">
           {error}
         </div>
       )}

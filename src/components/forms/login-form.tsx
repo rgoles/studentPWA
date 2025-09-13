@@ -106,7 +106,7 @@ export function LoginForm({
         <a href="#">Privacy Policy</a>.
       </div>
       {error && (
-        <div className="text-red-500 text-center text-xs text-balance">
+        <div className="text-center text-xs text-balance text-red-500">
           {error}
         </div>
       )}
