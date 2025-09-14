@@ -13,6 +13,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth.index'
+import { Route as AuthHoursListRouteImport } from './routes/_auth.hours-list'
 import { Route as AuthAddHoursRouteImport } from './routes/_auth.add-hours'
 import { Route as AuthAboutRouteImport } from './routes/_auth.about'
 
@@ -35,6 +36,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthHoursListRoute = AuthHoursListRouteImport.update({
+  id: '/hours-list',
+  path: '/hours-list',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAddHoursRoute = AuthAddHoursRouteImport.update({
   id: '/add-hours',
   path: '/add-hours',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/about': typeof AuthAboutRoute
   '/add-hours': typeof AuthAddHoursRoute
+  '/hours-list': typeof AuthHoursListRoute
   '/': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/about': typeof AuthAboutRoute
   '/add-hours': typeof AuthAddHoursRoute
+  '/hours-list': typeof AuthHoursListRoute
   '/': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,20 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_auth/about': typeof AuthAboutRoute
   '/_auth/add-hours': typeof AuthAddHoursRoute
+  '/_auth/hours-list': typeof AuthHoursListRoute
   '/_auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/register' | '/about' | '/add-hours' | '/'
+  fullPaths:
+    | '/login'
+    | '/register'
+    | '/about'
+    | '/add-hours'
+    | '/hours-list'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/register' | '/about' | '/add-hours' | '/'
+  to: '/login' | '/register' | '/about' | '/add-hours' | '/hours-list' | '/'
   id:
     | '__root__'
     | '/_auth'
@@ -81,6 +96,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_auth/about'
     | '/_auth/add-hours'
+    | '/_auth/hours-list'
     | '/_auth/'
   fileRoutesById: FileRoutesById
 }
@@ -120,6 +136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/hours-list': {
+      id: '/_auth/hours-list'
+      path: '/hours-list'
+      fullPath: '/hours-list'
+      preLoaderRoute: typeof AuthHoursListRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/add-hours': {
       id: '/_auth/add-hours'
       path: '/add-hours'
@@ -140,12 +163,14 @@ declare module '@tanstack/react-router' {
 interface AuthRouteChildren {
   AuthAboutRoute: typeof AuthAboutRoute
   AuthAddHoursRoute: typeof AuthAddHoursRoute
+  AuthHoursListRoute: typeof AuthHoursListRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAboutRoute: AuthAboutRoute,
   AuthAddHoursRoute: AuthAddHoursRoute,
+  AuthHoursListRoute: AuthHoursListRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 
