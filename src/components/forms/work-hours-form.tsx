@@ -16,6 +16,7 @@ import { calculateShiftDuration } from "@/lib/calculate-shift-duration";
 import type { Shift } from "@/types";
 
 export const WorkHoursForm = () => {
+  const [errorMessage, setErrorMessage] = useState<string>('')
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState<Shift>({
     shiftStart: "00:00",
@@ -39,6 +40,12 @@ export const WorkHoursForm = () => {
       shift.shiftEnd,
     );
 
+    if (calculatedTotalHours.decimalHours <= 0) {
+      setErrorMessage('Worked Hours must be greater than 0'
+      )
+      return
+    }
+
     const payload = {
       ...shift,
       totalHours: calculatedTotalHours,
@@ -58,42 +65,42 @@ export const WorkHoursForm = () => {
   };
 
   return (
-    <div className="mt-5 flex w-full flex-col items-center justify-center">
+    <div className="mt-5">
       <form
-        className="flex w-full flex-col items-start justify-center gap-2.5 md:w-xs"
+        className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
         onSubmit={onSubmitFunc}
       >
-        <div className="grid w-full grid-cols-4 gap-2">
-          <div className="col-span-2 space-y-2">
-            <Label htmlFor="shiftStart">Shift Start</Label>
-            <Input
-              type="time"
-              placeholder="Shift Start"
-              name="shiftStart"
-              value={shift.shiftStart}
-              onChange={(e) =>
-                setShift({
-                  ...shift,
-                  shiftStart: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="col-span-2 space-y-2">
-            <Label htmlFor="shiftEnd">Shift End</Label>
-            <Input
-              type="time"
-              placeholder="Shift End"
-              name="shiftEnd"
-              value={shift.shiftEnd}
-              onChange={(e) =>
-                setShift({
-                  ...shift,
-                  shiftEnd: e.target.value,
-                })
-              }
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="shiftStart">Shift Start</Label>
+          <Input
+            type="time"
+            placeholder="Shift Start"
+            name="shiftStart"
+            className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+            value={shift.shiftStart}
+            onChange={(e) =>
+              setShift({
+                ...shift,
+                shiftStart: e.target.value,
+              })
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="shiftEnd">Shift End</Label>
+          <Input
+            type="time"
+            placeholder="Shift End"
+            className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+            name="shiftEnd"
+            value={shift.shiftEnd}
+            onChange={(e) =>
+              setShift({
+                ...shift,
+                shiftEnd: e.target.value,
+              })
+            }
+          />
         </div>
 
         <div className="flex flex-col space-y-2">
@@ -105,7 +112,7 @@ export const WorkHoursForm = () => {
               <Button
                 variant="outline"
                 id="date-picker"
-                className="w-32 justify-between font-normal"
+                className="justify-between font-normal"
               >
                 {shift.date ? shift.date.toLocaleDateString() : "Select date"}
                 <ChevronDownIcon />
@@ -134,6 +141,7 @@ export const WorkHoursForm = () => {
           Submit
         </Button>
       </form>
+      {errorMessage}
       <p>Total: {shift.totalHours.hours + ":" + shift.totalHours.minutes}</p>
       <p>{shift.date.toLocaleDateString()}</p>
     </div>

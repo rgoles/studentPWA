@@ -10,8 +10,8 @@ export const HoursListScreen = () => {
 
   const fetchData = async () => {
     if (!uid) return;
-    const shiftsColRef = collection(db, "users", uid, "shifts");
-    const querySnapshot = await getDocs(shiftsColRef);
+    const shiftsCollectionRef = collection(db, "users", uid, "shifts");
+    const querySnapshot = await getDocs(shiftsCollectionRef);
     const items = querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
     setShifts(items);
   };
@@ -29,7 +29,7 @@ export const HoursListScreen = () => {
         <ul>
           {shifts.map((shift: any) => (
             <li key={shift.id}>
-              <pre>{JSON.stringify(shift.date, null, 2)}</pre>
+              {/*<pre>{JSON.stringify(shift.date, null, 2)}</pre>*/}
               <pre>{JSON.stringify(shift.shiftStart, null, 2)}</pre>
               <pre>{JSON.stringify(shift.shiftEnd, null, 2)}</pre>
               <pre>{JSON.stringify(shift.totalHours, null, 2)}</pre>

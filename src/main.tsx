@@ -4,7 +4,6 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import {
   AuthProvider,
-  type AuthContextType,
   useAuth,
 } from "./auth/auth-provider";
 import "./index.css";
@@ -32,7 +31,7 @@ function InnerApp() {
   if (auth.isInitialLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center p-4">
-        <div className="size-10 rounded-full border-4 border-gray-200 border-t-foreground animate-spin" />
+        <div className="border-t-foreground size-10 animate-spin rounded-full border-4 border-gray-200" />
       </div>
     );
   }
@@ -55,19 +54,6 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <App />
-    </StrictMode>
+    </StrictMode>,
   );
 }
-
-// // Render the app
-// const rootElement = document.getElementById("root")!;
-// if (!rootElement.innerHTML) {
-//   const root = ReactDOM.createRoot(rootElement);
-//   root.render(
-//     <StrictMode>
-//       <AuthProvider>
-//         <RouterProvider router={router} />
-//       </AuthProvider>
-//     </StrictMode>
-//   );
-// }
