@@ -16,7 +16,7 @@ import { calculateShiftDuration } from "@/lib/calculate-shift-duration";
 import type { Shift } from "@/types";
 
 export const WorkHoursForm = () => {
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState<Shift>({
     shiftStart: "00:00",
@@ -41,9 +41,8 @@ export const WorkHoursForm = () => {
     );
 
     if (calculatedTotalHours.decimalHours <= 0) {
-      setErrorMessage('Worked Hours must be greater than 0'
-      )
-      return
+      setErrorMessage("Worked Hours must be greater than 0");
+      return;
     }
 
     const payload = {
@@ -61,6 +60,7 @@ export const WorkHoursForm = () => {
       console.log("Saved payload:", payload);
     } catch (e) {
       console.error("Error adding document: ", e);
+      setErrorMessage(`Error adding document ${e}`);
     }
   };
 
