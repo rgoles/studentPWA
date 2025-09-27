@@ -10,8 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { loginWithEmailAndPassword } from "@/auth/index";
+import { signInWithEmail } from "@/auth/index";
 import { Link } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
+import type { AuthError } from "@supabase/supabase-js";
 
 export function LoginForm({
   className,
@@ -19,13 +21,22 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
+  const [error, setError] = useState<AuthError | null>(null);
+  const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { user, error } = await loginWithEmailAndPassword(email, password);
-    if (error) setError(error);
-    else console.log("Logged in:", user);
+
+    // Mislim da mi ne treba {data} iz signInWith... ne radim ovdje nista s njim mislim?
+
+    const { error } = await signInWithEmail(email, password);
+
+    if (!error) {
+      // navigate after successful login
+      router.navigate({ to: "/about" });
+    } else {
+      setError(error);
+      console.error(error);
+    }
   };
 
   return (
@@ -106,8 +117,8 @@ export function LoginForm({
         <a href="#">Privacy Policy</a>.
       </div>
       {error && (
-        <div className="text-center text-xs text-balance text-red-500">
-          {error}
+        <div className="text}-xs text-center text-balance text-red-500">
+          {error.message}
         </div>
       )}
     </div>

@@ -1,49 +1,41 @@
-import { auth } from "@/config/firebase";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import { supabase } from "@/config/supabase";
 
-export const registerWithEmailAndPassword = async (
-  email: string,
-  password: string,
-) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    return { user: userCredential.user, error: null };
-  } catch (err: any) {
-    return { user: null, error: err.message };
+export async function signUpNewUser(email: string, password: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+
+    // TODO: options redirect promijeni na pravi link npr about ili stogod
+
+    options: {
+      emailRedirectTo: "https://example.com/welcome",
+    },
+  });
+  if (error) {
+    console.error("Login failed:", error.message);
+  } else {
+    console.log("Login successful:", data.user);
   }
-};
+  return { data, error };
+}
 
-export const loginWithEmailAndPassword = async (
-  email: string,
-  password: string,
-) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    return { user: userCredential.user, error: null };
-  } catch (err: any) {
-    return { user: null, error: err.message };
+export async function signInWithEmail(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+  if (error) {
+    console.error("Login failed:", error.message);
+  } else {
+    console.log("Login successful:", data.user);
   }
-};
+  return { data, error };
+}
 
-export const signOutFunction = () => {
-  signOut(auth)
-    .then(() => {
-      console.log("Sign-out successful.");
-    })
-    .catch((error) => {
-      console.log("Sign-out failed.");
-      console.log(error);
-    });
-};
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Signout failed");
+  }
+  return error;
+}

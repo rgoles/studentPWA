@@ -9,60 +9,56 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "@/config/firebase";
-import { useAuth } from "@/auth";
-import { calculateShiftDuration } from "@/lib/calculate-shift-duration";
 import type { Shift } from "@/types";
+import { supabase } from "@/config/supabase";
+import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
 
-export const WorkHoursForm = () => {
-  const [errorMessage, setErrorMessage] = useState<string>("");
+export const WorkHoursForm = ({ userId }: { userId: string }) => {
+  const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState<Shift>({
-    shiftStart: "00:00",
-    shiftEnd: "00:00",
-    totalHours: {
-      hours: 0,
-      minutes: 0,
-      decimalHours: 0,
-    },
-    date: new Date(),
+    start_time: "00:00",
+    end_time: "00:00",
+    total_hours: null,
+    shift_date: new Date(),
   });
-
-  const { user } = useAuth();
-  const uid = user.uid;
 
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const calculatedTotalHours = calculateShiftDuration(
-      shift.shiftStart,
-      shift.shiftEnd,
+    const calculatedTotalHours = calculateShiftDurationDecimal(
+      shift.start_time,
+      shift.end_time,
     );
 
-    if (calculatedTotalHours.decimalHours <= 0) {
+    if (calculatedTotalHours <= 0) {
       setErrorMessage("Worked Hours must be greater than 0");
       return;
     }
 
     const payload = {
       ...shift,
-      totalHours: calculatedTotalHours,
+      total_hours: calculatedTotalHours,
+      user_id: userId, // if your table expects a user id
+      // shiftDate: shift.shiftDate ? shift.shiftDate.toISOString() : null, // if your DB expects text/timestamp
     };
-    setShift(payload);
+    setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
 
-    try {
-      const docRef = await addDoc(
-        collection(db, "users", uid, "shifts"),
-        payload,
-      );
-      console.log("Document written with ID: ", docRef.id);
-      console.log("Saved payload:", payload);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-      setErrorMessage(`Error adding document ${e}`);
-    }
+    const { data, error } = await supabase
+      .from("work_hours")
+      .insert([payload])
+      .select();
+    console.log(data);
+    if (error) setErrorMessage(error.message);
   };
+
+  const dateLabel = shift.shift_date
+    ? shift.shift_date.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      })
+    : "Select date";
 
   return (
     <div className="mt-5">
@@ -77,15 +73,16 @@ export const WorkHoursForm = () => {
             placeholder="Shift Start"
             name="shiftStart"
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-            value={shift.shiftStart}
+            value={shift.start_time}
             onChange={(e) =>
               setShift({
                 ...shift,
-                shiftStart: e.target.value,
+                start_time: e.target.value,
               })
             }
           />
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="shiftEnd">Shift End</Label>
           <Input
@@ -93,11 +90,11 @@ export const WorkHoursForm = () => {
             placeholder="Shift End"
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             name="shiftEnd"
-            value={shift.shiftEnd}
+            value={shift.end_time}
             onChange={(e) =>
               setShift({
                 ...shift,
-                shiftEnd: e.target.value,
+                end_time: e.target.value,
               })
             }
           />
@@ -114,8 +111,8 @@ export const WorkHoursForm = () => {
                 id="date-picker"
                 className="justify-between font-normal"
               >
-                {shift.date ? shift.date.toLocaleDateString() : "Select date"}
-                <ChevronDownIcon />
+                <span>{dateLabel}</span>
+                <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -124,12 +121,12 @@ export const WorkHoursForm = () => {
             >
               <Calendar
                 mode="single"
-                selected={shift.date}
+                selected={shift.shift_date ?? undefined}
                 captionLayout="dropdown"
                 onSelect={(date) => {
                   setShift({
                     ...shift,
-                    date: date ?? new Date(),
+                    shift_date: date ?? null,
                   });
                   setOpen(false);
                 }}
@@ -137,13 +134,16 @@ export const WorkHoursForm = () => {
             </PopoverContent>
           </Popover>
         </div>
+
         <Button className="w-full" type="submit">
           Submit
         </Button>
       </form>
-      {errorMessage}
-      <p>Total: {shift.totalHours.hours + ":" + shift.totalHours.minutes}</p>
-      <p>{shift.date.toLocaleDateString()}</p>
+
+      {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
+
+      <p>Total: {shift.total_hours ? `${shift.total_hours}` : "00:00"}</p>
+      <p>Date: {shift.shift_date ? shift.shift_date.toLocaleString() : "—"}</p>
     </div>
   );
 };

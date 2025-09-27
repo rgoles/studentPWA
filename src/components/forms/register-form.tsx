@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { registerWithEmailAndPassword, useAuth } from "@/auth";
+import { signUpNewUser, useAuth } from "@/auth";
 import { Link } from "@tanstack/react-router";
 
 export function RegisterForm({
@@ -26,9 +26,11 @@ export function RegisterForm({
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { user, error } = await registerWithEmailAndPassword(email, password);
+    // Mislim da mi ne treba {data} iz signUpWithNewUser... ne radim ovdje nista s njim mislim?
+
+    const { data } = await signUpNewUser(email, password);
     if (error) setError(error);
-    else console.log("Logged in:", user);
+    else console.log("Logged in:", email, data);
   };
 
   return (

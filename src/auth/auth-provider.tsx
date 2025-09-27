@@ -1,4 +1,4 @@
-import { onAuthStateChanged } from "firebase/auth";
+import { supabase } from "@/config/supabase";
 import {
   createContext,
   useContext,
@@ -6,40 +6,58 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { auth } from "@/config/firebase"; // <-- use initialized instance
 
 export type User = {
-  [key: string]: any; // keys are strings, values can be anything
+  [key: string]: any;
 };
 
 export interface AuthContextType {
   isSignedIn: boolean;
   isInitialLoading: boolean;
-  user: User;
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isSignedIn: false,
   isInitialLoading: true,
-  user: {},
+  user: null,
 });
 
 export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      setIsSignedIn(!!user);
+    // Check current session first
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        setIsSignedIn(true);
+      }
       setIsInitialLoading(false);
-      if (user) {
-        setUser(user);
-        console.log(user.uid);
-        console.log("signed in");
-      } else console.log("not");
     });
-    return () => unsub();
+
+    // Subscribe to auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        setIsSignedIn(true);
+        console.log(session.user.id);
+        console.log("signed in");
+      } else {
+        setUser(null);
+        setIsSignedIn(false);
+        console.log("not signed in");
+      }
+      setIsInitialLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -48,9 +66,10 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     </AuthContext.Provider>
   );
 }
+
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useTheme must be used inside <ThemeProvider>");
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }

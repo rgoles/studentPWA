@@ -1,37 +1,38 @@
-import { useAuth } from "@/auth";
-import { db } from "@/config/firebase";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { supabase } from "@/config/supabase";
 import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Calendar, Clock } from "lucide-react";
 
-export const HoursListScreen = () => {
+export const HoursListScreen = ({ userId }: { userId: string }) => {
   const [shifts, setShifts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
-  const uid = user.uid;
-
-  const deleteShift = async (shiftId: string) => {
-    await deleteDoc(doc(db, "users", uid, "shifts", shiftId));
-    console.log(`shift that is deleted is ${shiftId}`);
-  };
 
   const fetchData = async () => {
     setIsLoading(true);
-    if (!uid) return;
-    const shiftsCollectionRef = collection(db, "users", uid, "shifts");
-    const querySnapshot = await getDocs(shiftsCollectionRef);
-    const items = querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    setShifts(items);
+    const { data, error } = await supabase.from("work_hours").select();
+    console.log(data);
+    setShifts(data);
     setIsLoading(false);
+    console.log(error);
   };
 
-  // TODO: moram provjerit ovaj useEffect mozda mi i ne treba, svakako extractat fetchData funkciju negdje dalje
-  // mozda i fetchat ranije smjene npr na loginu? zato da korisnik ne mora cekat loading kad dodje na page a mozda neki cache implementirat?
+  function decimalToHours(decimalHours: number): string {
+    const decimalPart = (decimalHours % 1) * 60;
+    decimalHours = Math.floor(decimalHours);
+    const finalNumber = [
+      String(decimalHours),
+      ":",
+      String(decimalPart).padStart(2, "0"),
+    ].join("");
+    return finalNumber;
+  }
+
+  decimalToHours(2.75);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userId]);
 
   return isLoading ? (
     <p>'Loading'</p>
@@ -70,7 +71,7 @@ export const HoursListScreen = () => {
                   <Calendar className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="text-foreground truncate text-sm font-medium">
-                      <pre>{shift.date.toDate().toLocaleString()}</pre>
+                      {shift.shift_date}{" "}
                     </p>
                   </div>
                 </div>
@@ -80,7 +81,7 @@ export const HoursListScreen = () => {
                   <Clock className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="text-muted-foreground font-mono text-sm">
-                      {shift.shiftStart} - {shift.shiftEnd}
+                      {shift.start_time} - {shift.end_time}
                     </p>
                   </div>
                 </div>
@@ -88,7 +89,7 @@ export const HoursListScreen = () => {
                 {/* Total hours */}
                 <div className="flex justify-end sm:justify-start">
                   <Badge variant="outline" className="font-mono text-xs">
-                    {shift.totalHours.hours}h {shift.totalHours.minutes}m
+                    {decimalToHours(shift.total_hours)} hours worked
                   </Badge>
                 </div>
                 <button
