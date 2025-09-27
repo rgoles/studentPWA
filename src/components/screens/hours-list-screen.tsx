@@ -95,12 +95,12 @@ export const HoursListScreen = () => {
                   onClick={() => {
                     deleteShift(shift.id);
                   }}
-                  className="absolute -top-8 -right-7 rounded-full bg-red-300 p-0.5"
+                  className="bg-accent text-foreground absolute -top-8 -right-7 rounded-full p-0.5"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                   >
                     <g fill="none">
