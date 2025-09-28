@@ -39,8 +39,7 @@ export const WorkHoursForm = ({ userId }: { userId: string }) => {
     const payload = {
       ...shift,
       total_hours: calculatedTotalHours,
-      user_id: userId, // if your table expects a user id
-      // shiftDate: shift.shiftDate ? shift.shiftDate.toISOString() : null, // if your DB expects text/timestamp
+      user_id: userId,
     };
     setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
 
@@ -121,12 +120,12 @@ export const WorkHoursForm = ({ userId }: { userId: string }) => {
             >
               <Calendar
                 mode="single"
-                selected={shift.shift_date ?? undefined}
+                selected={shift.shift_date || undefined}
                 captionLayout="dropdown"
                 onSelect={(date) => {
                   setShift({
                     ...shift,
-                    shift_date: date ?? null,
+                    shift_date: date,
                   });
                   setOpen(false);
                 }}

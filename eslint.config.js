@@ -17,6 +17,8 @@ export default tseslint.config([
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      allowConstantExport: true,
+      allowExportNames: ["useSidebar"],
     },
     languageOptions: {
       ecmaVersion: 2020,
