@@ -8,28 +8,45 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { signUpNewUser, useAuth } from "@/auth";
+import { signUpNewUser } from "@/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { AuthError } from "@supabase/supabase-js";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import type z from "zod";
+import { UserLoginSchema } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { UserLoginType } from "@/types";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<AuthError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate({ from: "/register" });
-  const { isSignedIn } = useAuth();
-  console.log(isSignedIn ? "User is signed in" : "User is not signed in");
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+
+  const form = useForm<z.infer<typeof UserLoginSchema>>({
+    resolver: zodResolver(UserLoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit: SubmitHandler<UserLoginType> = async (data) => {
     setIsLoading(true);
 
-    const { data, error } = await signUpNewUser(email, password);
+    const { error } = await signUpNewUser(data.email, data.password);
     if (!error) {
       navigate({ to: "/login", replace: true });
       console.log("DATA:", data);
@@ -49,53 +66,60 @@ export function RegisterForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="/"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="john.smith@gmail.com" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your email address.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Enter your password.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <div className="flex flex-col gap-3">
+                  <Button type="submit" disabled={isLoading} className="w-full">
+                    {isLoading ? "Loading..." : "Register"}
+                  </Button>
+                  <Button variant="outline" className="w-full">
+                    Register with Google
+                  </Button>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
               </div>
-              <div className="flex flex-col gap-3">
-                <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? "Loading..." : "Register"}
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Register with Google
-                </Button>
+              <div className="mt-4 text-center text-sm">
+                Already have an account?{" "}
+                <Link to="/login" className="underline underline-offset-4">
+                  Login
+                </Link>
               </div>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link to="/login" className="underline underline-offset-4">
-                Login
-              </Link>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
       {error && (
