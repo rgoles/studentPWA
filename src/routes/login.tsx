@@ -1,8 +1,17 @@
 import { LoginForm } from "@/components/forms/login-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { GalleryVerticalEnd } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: ({ context, location }) => {
+    const user = context.auth?.user;
+    if (user) {
+      throw redirect({
+        to: "/about",
+        search: { redirect: location.href },
+      });
+    }
+  },
   component: RouteComponent,
 });
 
@@ -14,7 +23,7 @@ function RouteComponent() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <GalleryVerticalEnd className="size-4" />
           </div>
-          Acme Inc.
+          student.com.hr{" "}
         </a>
         <LoginForm />
       </div>

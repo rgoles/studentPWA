@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { signUpNewUser, useAuth } from "@/auth";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import type { AuthError } from "@supabase/supabase-js";
 
 export function RegisterForm({
   className,
@@ -19,18 +20,23 @@ export function RegisterForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
+  const [error, setError] = useState<AuthError | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate({ from: "/register" });
   const { isSignedIn } = useAuth();
   console.log(isSignedIn ? "User is signed in" : "User is not signed in");
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    // Mislim da mi ne treba {data} iz signUpWithNewUser... ne radim ovdje nista s njim mislim?
-
-    const { data } = await signUpNewUser(email, password);
-    if (error) setError(error);
-    else console.log("Logged in:", email, data);
+    const { data, error } = await signUpNewUser(email, password);
+    if (!error) {
+      navigate({ to: "/login", replace: true });
+      console.log("DATA:", data);
+    } else {
+      setIsLoading(false);
+      setError(error);
+    }
   };
 
   return (
@@ -75,8 +81,8 @@ export function RegisterForm({
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Register
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? "Loading..." : "Register"}
                 </Button>
                 <Button variant="outline" className="w-full">
                   Register with Google
@@ -94,7 +100,7 @@ export function RegisterForm({
       </Card>
       {error && (
         <div className="text-center text-xs text-balance text-red-500">
-          {error}
+          {error.message}
         </div>
       )}
     </div>
