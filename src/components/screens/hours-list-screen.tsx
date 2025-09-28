@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Calendar, Clock } from "lucide-react";
+import { decimalToHours } from "@/lib/timeUtils";
 
 export const HoursListScreen = ({ userId }: { userId: string }) => {
   const [shifts, setShifts] = useState<any[]>([]);
@@ -12,23 +13,14 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
     setIsLoading(true);
     const { data, error } = await supabase.from("work_hours").select();
     console.log(data);
-    setShifts(data);
+    setShifts(data ?? []);
     setIsLoading(false);
     console.log(error);
   };
 
-  function decimalToHours(decimalHours: number): string {
-    const decimalPart = (decimalHours % 1) * 60;
-    decimalHours = Math.floor(decimalHours);
-    const finalNumber = [
-      String(decimalHours),
-      ":",
-      String(decimalPart).padStart(2, "0"),
-    ].join("");
-    return finalNumber;
+  function deleteShift(shiftId: string) {
+    console.log("deleted shift", shiftId);
   }
-
-  decimalToHours(2.75);
 
   useEffect(() => {
     fetchData();
