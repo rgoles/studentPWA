@@ -2,19 +2,28 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import {
-  AuthProvider,
-  useAuth,
-} from "./auth/auth-provider";
+import { AuthProvider, useAuth } from "./auth/auth-provider";
 import "./index.css";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { registerSW } from "virtual:pwa-register";
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
   context: {
     auth: undefined!,
+  },
+});
+
+registerSW({
+  onNeedRefresh() {
+    // optional: show a toast/snackbar to refresh
+    // e.g., prompt user -> if they accept:
+    // updateSW(true)
+  },
+  onOfflineReady() {
+    // optional: show “App ready to work offline”
   },
 });
 
