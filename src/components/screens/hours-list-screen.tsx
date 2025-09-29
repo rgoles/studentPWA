@@ -21,9 +21,6 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
     console.log(error);
   };
 
-  function deleteShift(shiftId: string) {
-    console.log("deleted shift", shiftId);
-  }
 
   useEffect(() => {
     fetchData();
