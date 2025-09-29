@@ -25,7 +25,6 @@ import {
 } from "../ui/form";
 import type { z } from "zod";
 import type { UserLoginType } from "@/types";
-
 export function LoginForm({
   className,
   ...props
