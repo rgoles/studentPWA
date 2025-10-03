@@ -42,27 +42,23 @@ export function AuthLayout() {
     <div className="m-2 h-lvh">
       <h1>Authenticated Route</h1>
       <p>This route's content is only visible to authenticated users.</p>
-      <div className="bg-background border-t-secondary fixed bottom-0 left-1/2 flex w-full md:w-fit -translate-x-1/2 justify-center border-t p-4">
+      <div className="bg-background border-t-secondary fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 justify-center border-t p-4 md:w-fit">
         <ul className="relative flex w-fit gap-1">
           <li>
             <Link
               to="/add-hours"
-              className="text-muted-foreground data-[status='active']:bg-secondary data-[status='active']:text-primary flex items-center rounded-2xl p-4"
+              className="text-muted-foreground data-[status='active']:text-primary flex flex-col items-center rounded-2xl p-4"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
-                viewBox="0 0 24 24"
+                fill="currentColor"
+                viewBox="0 0 256 256"
               >
-                <g fill="none">
-                  <path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
-                  <path
-                    fill="currentColor"
-                    d="M7 4a1 1 0 0 1 2 0v1h6V4a1 1 0 1 1 2 0v1h2a2 2 0 0 1 2 2v3H3V7a2 2 0 0 1 2-2h2zm11 10a1 1 0 0 1 1 1v2h2a1 1 0 1 1 0 2h-2v2a1 1 0 1 1-2 0v-2h-2a1 1 0 1 1 0-2h2v-2a1 1 0 0 1 1-1m0-2a3 3 0 0 0-2.836 2.018a1.9 1.9 0 0 1-1.146 1.146a3.001 3.001 0 0 0-.174 5.605l.174.067q.18.063.346.164H5a2 2 0 0 1-2-2v-7z"
-                  />
-                </g>
+                <path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z"></path>
               </svg>
+              <span>More</span>
             </Link>
           </li>
           <li>
@@ -72,18 +68,13 @@ export function AuthLayout() {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                width="32"
+                height="32"
+                fill="#000000"
+                viewBox="0 0 256 256"
               >
-                <g fill="none">
-                  <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                  <path
-                    fill="currentColor"
-                    d="M20 17.5a1.5 1.5 0 0 1 0 3H9a1.5 1.5 0 0 1 0-3zm-15.5 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m15.5-7a1.5 1.5 0 0 1 .144 2.993L20 13.5H9a1.5 1.5 0 0 1-.144-2.993L9 10.5zm-15.5 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m0-7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m15.5 0a1.5 1.5 0 0 1 .144 2.993L20 6.5H9a1.5 1.5 0 0 1-.144-2.993L9 3.5z"
-                  />
-                </g>
-              </svg>
+                <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
+              </svg>{" "}
             </Link>
           </li>
           <li>
@@ -114,22 +105,18 @@ export function AuthLayout() {
           <li>
             <Link
               to="/about"
-              className="text-muted-foreground data-[status='active']:bg-secondary data-[status='active']:text-primary flex items-center rounded-2xl p-4"
+              className="text-muted-foreground data-[status='active']:text-primary flex flex-col items-center rounded-2xl p-4"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
-                viewBox="0 0 24 24"
+                fill="currentColor"
+                viewBox="0 0 256 256"
               >
-                <g fill="none">
-                  <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                  <path
-                    fill="currentColor"
-                    d="M12 2.5A1.5 1.5 0 0 1 13.5 4v5.402L18.178 6.7a1.5 1.5 0 0 1 1.5 2.598L15 12l4.678 2.701a1.5 1.5 0 0 1-1.5 2.598l-4.678-2.7V20a1.5 1.5 0 0 1-3 0v-5.402L5.822 17.3a1.5 1.5 0 1 1-1.5-2.598L9 12L4.322 9.299a1.5 1.5 0 0 1 1.5-2.598l4.678 2.7V4A1.5 1.5 0 0 1 12 2.5"
-                  />
-                </g>
-              </svg>
+                <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+              </svg>{" "}
+              <span>More</span>
             </Link>
           </li>
         </ul>

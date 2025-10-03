@@ -18,7 +18,7 @@ export const calculateShiftDurationDecimal = (
 };
 
 export const decimalToHours = (decimalHours: number): string => {
-  const decimalPart = (decimalHours % 1) * 60;
+  const decimalPart = Math.round((decimalHours % 1) * 60);
   const hours = Math.floor(decimalHours);
   const finalNumber = [
     String(hours),

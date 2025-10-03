@@ -18,9 +18,9 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
     console.log(error);
   };
 
-  function deleteShift(shiftId: string) {
-    console.log("deleted shift", shiftId);
-  }
+  const deleteShift = async (shiftId: string) => {
+    await supabase.from("work_hours").delete().eq("id", shiftId);
+  };
 
   useEffect(() => {
     fetchData();
