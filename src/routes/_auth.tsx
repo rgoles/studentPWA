@@ -82,13 +82,13 @@ export function AuthLayout() {
 
           <li>
             <Link
-              to="/about"
+              to="/"
               className="text-muted-foreground data-[status='active']:text-primary flex flex-col items-center rounded-2xl p-4"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
+                width="24"
+                height="24"
                 fill="#000000"
                 viewBox="0 0 256 256"
               >
