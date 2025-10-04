@@ -4,10 +4,13 @@ import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Calendar, Clock } from "lucide-react";
 import { decimalToHours } from "@/lib/timeUtils";
+import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 
 export const HoursListScreen = ({ userId }: { userId: string }) => {
   const [shifts, setShifts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const { remove } = useWorkHoursMutations();
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -85,9 +88,7 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
                   </Badge>
                 </div>
                 <button
-                  onClick={() => {
-                    deleteShift(shift.id);
-                  }}
+                  onClick={() => remove.mutate(shift.id)}
                   className="bg-accent text-foreground absolute -top-8 -right-7 rounded-full p-0.5"
                 >
                   <svg
