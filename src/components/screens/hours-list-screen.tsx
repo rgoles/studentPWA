@@ -9,7 +9,7 @@ import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 export const HoursListScreen = ({ userId }: { userId: string }) => {
   const [shifts, setShifts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { remove } = useWorkHoursMutations();
 
   const fetchData = async () => {
@@ -21,6 +21,9 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
     console.log(error);
   };
 
+  // const deleteShift = async (shiftId: string) => {
+  //  await supabase.from("work_hours").delete().eq("id", shiftId);
+  //  };
 
   useEffect(() => {
     fetchData();
