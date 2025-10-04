@@ -7,7 +7,7 @@ import {
   useWorkHoursQuery,
 } from "@/hooks/use-work-hours";
 
-export const HoursListScreen = () => {
+export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { shifts, error, isLoading } = useWorkHoursQuery();
 
@@ -37,7 +37,7 @@ export const HoursListScreen = () => {
           <Card className="p-6 text-center">
             <Clock className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
             <p className="text-muted-foreground">
-              {"No worked hours recorded yet"}
+                     {"No worked hours recorded yet"}
             </p>
           </Card>
         ) : (

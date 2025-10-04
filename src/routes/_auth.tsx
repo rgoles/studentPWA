@@ -46,7 +46,7 @@ export function AuthLayout() {
         <ul className="relative flex w-fit gap-1">
           <li>
             <Link
-              to="/add-hours"
+              to="/shifts/add"
               className="text-muted-foreground data-[status='active']:text-primary flex flex-col items-center rounded-2xl p-4"
             >
               <svg
@@ -64,7 +64,7 @@ export function AuthLayout() {
 
           <li>
             <Link
-              to="/hours-list"
+              to="/shifts/list"
               className="text-muted-foreground data-[status='active']:text-primary flex flex-col items-center rounded-2xl p-4"
             >
               <svg

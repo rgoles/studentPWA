@@ -13,7 +13,7 @@ import type { Shift } from "@/types";
 import { supabase } from "@/config/supabase";
 import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
 
-export const WorkHoursForm = ({ userId }: { userId: string }) => {
+export const ShiftAddForm = ({ userId }: { userId: string }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState<Shift>({

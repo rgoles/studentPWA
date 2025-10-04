@@ -1,8 +1,10 @@
 import { useAuth } from "@/auth";
-import { HoursListScreen } from "@/components/screens/hours-list-screen";
+import {
+  ShiftsListScreen,
+} from "@/components/screens/shifts-list-screen";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_auth/hours-list")({
+export const Route = createFileRoute("/_auth/shifts/list")({
   component: RouteComponent,
 });
 
@@ -11,5 +13,5 @@ function RouteComponent() {
   if (isInitialLoading) return <p>Loading…</p>;
   if (!user) return <p>You must login</p>;
 
-  return <HoursListScreen />;
+  return <ShiftsListScreen />;
 }

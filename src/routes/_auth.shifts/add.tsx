@@ -1,8 +1,8 @@
 import { useAuth } from "@/auth";
-import { WorkHoursForm } from "@/components/forms/work-hours-form";
+import { ShiftAddForm  } from "@/components/forms/shift-add-form";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_auth/add-hours")({
+export const Route = createFileRoute("/_auth/shifts/add")({
   component: RouteComponent,
 });
 
@@ -11,5 +11,5 @@ function RouteComponent() {
   if (isInitialLoading) return <p>Loading…</p>;
   if (!user) return <p>You must login</p>;
 
-  return <WorkHoursForm userId={user.id} />;
+  return <ShiftAddForm userId={user.id} />;
 }

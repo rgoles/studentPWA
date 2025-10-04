@@ -13,9 +13,9 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth.index'
-import { Route as AuthHoursListRouteImport } from './routes/_auth.hours-list'
-import { Route as AuthAddHoursRouteImport } from './routes/_auth.add-hours'
 import { Route as AuthAboutRouteImport } from './routes/_auth.about'
+import { Route as AuthShiftsListRouteImport } from './routes/_auth.shifts/list'
+import { Route as AuthShiftsAddRouteImport } from './routes/_auth.shifts/add'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -36,19 +36,19 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthHoursListRoute = AuthHoursListRouteImport.update({
-  id: '/hours-list',
-  path: '/hours-list',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthAddHoursRoute = AuthAddHoursRouteImport.update({
-  id: '/add-hours',
-  path: '/add-hours',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthAboutRoute = AuthAboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthShiftsListRoute = AuthShiftsListRouteImport.update({
+  id: '/shifts/list',
+  path: '/shifts/list',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthShiftsAddRoute = AuthShiftsAddRouteImport.update({
+  id: '/shifts/add',
+  path: '/shifts/add',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -56,17 +56,17 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/about': typeof AuthAboutRoute
-  '/add-hours': typeof AuthAddHoursRoute
-  '/hours-list': typeof AuthHoursListRoute
   '/': typeof AuthIndexRoute
+  '/shifts/add': typeof AuthShiftsAddRoute
+  '/shifts/list': typeof AuthShiftsListRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/about': typeof AuthAboutRoute
-  '/add-hours': typeof AuthAddHoursRoute
-  '/hours-list': typeof AuthHoursListRoute
   '/': typeof AuthIndexRoute
+  '/shifts/add': typeof AuthShiftsAddRoute
+  '/shifts/list': typeof AuthShiftsListRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,9 +74,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_auth/about': typeof AuthAboutRoute
-  '/_auth/add-hours': typeof AuthAddHoursRoute
-  '/_auth/hours-list': typeof AuthHoursListRoute
   '/_auth/': typeof AuthIndexRoute
+  '/_auth/shifts/add': typeof AuthShiftsAddRoute
+  '/_auth/shifts/list': typeof AuthShiftsListRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -84,20 +84,20 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/about'
-    | '/add-hours'
-    | '/hours-list'
     | '/'
+    | '/shifts/add'
+    | '/shifts/list'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/register' | '/about' | '/add-hours' | '/hours-list' | '/'
+  to: '/login' | '/register' | '/about' | '/' | '/shifts/add' | '/shifts/list'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/register'
     | '/_auth/about'
-    | '/_auth/add-hours'
-    | '/_auth/hours-list'
     | '/_auth/'
+    | '/_auth/shifts/add'
+    | '/_auth/shifts/list'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,20 +136,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/hours-list': {
-      id: '/_auth/hours-list'
-      path: '/hours-list'
-      fullPath: '/hours-list'
-      preLoaderRoute: typeof AuthHoursListRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/add-hours': {
-      id: '/_auth/add-hours'
-      path: '/add-hours'
-      fullPath: '/add-hours'
-      preLoaderRoute: typeof AuthAddHoursRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/about': {
       id: '/_auth/about'
       path: '/about'
@@ -157,21 +143,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAboutRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/shifts/list': {
+      id: '/_auth/shifts/list'
+      path: '/shifts/list'
+      fullPath: '/shifts/list'
+      preLoaderRoute: typeof AuthShiftsListRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/shifts/add': {
+      id: '/_auth/shifts/add'
+      path: '/shifts/add'
+      fullPath: '/shifts/add'
+      preLoaderRoute: typeof AuthShiftsAddRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthAboutRoute: typeof AuthAboutRoute
-  AuthAddHoursRoute: typeof AuthAddHoursRoute
-  AuthHoursListRoute: typeof AuthHoursListRoute
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthShiftsAddRoute: typeof AuthShiftsAddRoute
+  AuthShiftsListRoute: typeof AuthShiftsListRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAboutRoute: AuthAboutRoute,
-  AuthAddHoursRoute: AuthAddHoursRoute,
-  AuthHoursListRoute: AuthHoursListRoute,
   AuthIndexRoute: AuthIndexRoute,
+  AuthShiftsAddRoute: AuthShiftsAddRoute,
+  AuthShiftsListRoute: AuthShiftsListRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
