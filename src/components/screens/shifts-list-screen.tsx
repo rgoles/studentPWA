@@ -22,10 +22,7 @@ export const ShiftsListScreen = () => {
           <h1 className="text-foreground text-2xl font-semibold">
             {"My Shifts"}
           </h1>
-          <p className="text-muted-foreground mt-1">
-            {"See your past shifts"}
-
-          </p>
+          <p className="text-muted-foreground mt-1">{"See your past shifts"}</p>
         </div>
       </div>
 
@@ -35,15 +32,12 @@ export const ShiftsListScreen = () => {
           <Card className="p-6 text-center">
             <Clock className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
             <p className="text-muted-foreground">
-                     {"No worked hours recorded yet"}
+              {"No worked hours recorded yet"}
             </p>
           </Card>
         ) : (
           shifts.data.map((shift) => (
-            <Card
-              key={shift.id}
-              className="hover:bg-accent/50 p-4 transition-colors"
-            >
+            <Card key={shift.id} className="hover:bg-accent/50 p-4">
               <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center">
                 {/* Date section */}
                 <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -73,7 +67,7 @@ export const ShiftsListScreen = () => {
                 </div>
                 <button
                   onClick={() => remove.mutate(shift.id)}
-                  className="bg-accent text-foreground absolute -top-6 -right-6 rounded-full p-0.5"
+                  className="bg-destructive cursor-pointer text-destructive-foreground absolute -top-6 -right-6 rounded-full p-0.5"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
