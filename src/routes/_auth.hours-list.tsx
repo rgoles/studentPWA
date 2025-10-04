@@ -11,5 +11,5 @@ function RouteComponent() {
   if (isInitialLoading) return <p>Loading…</p>;
   if (!user) return <p>You must login</p>;
 
-  return <HoursListScreen userId={user.id} />;
+  return <HoursListScreen />;
 }

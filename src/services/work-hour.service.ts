@@ -11,3 +11,9 @@ export async function deleteWorkHour(id: number) {
 
   return { id };
 }
+
+export async function fetchWorkHours() {
+  const { data, error } = await supabase.from("work_hours").select();
+  if (error) throw error;
+  return { data, error };
+}

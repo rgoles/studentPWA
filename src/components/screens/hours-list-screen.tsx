@@ -1,37 +1,23 @@
-import { supabase } from "@/config/supabase";
-import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Calendar, Clock } from "lucide-react";
 import { decimalToHours } from "@/lib/timeUtils";
-import { useWorkHoursMutations } from "@/hooks/use-work-hours";
+import {
+  useWorkHoursMutations,
+  useWorkHoursQuery,
+} from "@/hooks/use-work-hours";
 
-export const HoursListScreen = ({ userId }: { userId: string }) => {
-  const [shifts, setShifts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
+export const HoursListScreen = () => {
   const { remove } = useWorkHoursMutations();
+  const { shifts, error, isLoading } = useWorkHoursQuery();
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase.from("work_hours").select();
-    console.log(data);
-    setShifts(data ?? []);
-    setIsLoading(false);
-    console.log(error);
-  };
+  console.log(shifts);
 
-  // const deleteShift = async (shiftId: string) => {
-  //  await supabase.from("work_hours").delete().eq("id", shiftId);
-  //  };
+  if (error) return <div>Error {error.message}</div>;
 
-  useEffect(() => {
-    fetchData();
-  }, [userId]);
+  if (isLoading || !shifts) return <div>Loading...</div>;
 
-  return isLoading ? (
-    <p>'Loading'</p>
-  ) : (
+  return (
     <div className="mx-auto w-full max-w-4xl space-y-4 p-4">
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -47,7 +33,7 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
 
       {/* Mobile-first list */}
       <div className="space-y-3">
-        {shifts.length === 0 ? (
+        {shifts.data.length === 0 ? (
           <Card className="p-6 text-center">
             <Clock className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
             <p className="text-muted-foreground">
@@ -55,7 +41,7 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
             </p>
           </Card>
         ) : (
-          shifts.map((shift) => (
+          shifts.data.map((shift) => (
             <Card
               key={shift.id}
               className="hover:bg-accent/50 p-4 transition-colors"
@@ -113,7 +99,7 @@ export const HoursListScreen = ({ userId }: { userId: string }) => {
       </div>
 
       {/* Summary footer for mobile */}
-      {shifts.length > 0 && (
+      {shifts.data.length > 0 && (
         <Card className="bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground text-sm">
