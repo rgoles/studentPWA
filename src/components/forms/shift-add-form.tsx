@@ -10,10 +10,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
 import type { Shift } from "@/types";
-import { supabase } from "@/config/supabase";
 import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
+import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 
 export const ShiftAddForm = ({ userId }: { userId: string }) => {
+  let stateMessage = "";
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState<Shift>({
@@ -23,9 +24,10 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
     shift_date: new Date(),
   });
 
+  const { add } = useWorkHoursMutations();
+
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const calculatedTotalHours = calculateShiftDurationDecimal(
       shift.start_time,
       shift.end_time,
@@ -42,14 +44,12 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
       user_id: userId,
     };
     setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
-
-    const { data, error } = await supabase
-      .from("work_hours")
-      .insert([payload])
-      .select();
-    console.log(data);
-    if (error) setErrorMessage(error.message);
+    add.mutate(payload);
   };
+
+  if (add.isPending) stateMessage = "Saving...";
+  else if (add.isError) stateMessage = `Error: ${add.error.message}`;
+  else if (add.isSuccess) stateMessage = "Saved successfully!";
 
   const dateLabel = shift.shift_date
     ? shift.shift_date.toLocaleDateString(undefined, {
@@ -138,7 +138,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
           Submit
         </Button>
       </form>
-
+      <p>{stateMessage}</p>
       {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
       <p>Total: {shift.total_hours ? `${shift.total_hours}` : "00:00"}</p>

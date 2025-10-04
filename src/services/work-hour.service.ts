@@ -1,6 +1,6 @@
 import { supabase } from "@/config/supabase";
 
-export async function deleteWorkHour(id: number) {
+export const deleteShift = async (id: number) => {
   const { error } = await supabase.from("work_hours").delete().eq("id", id);
 
   if (error) {
@@ -10,10 +10,19 @@ export async function deleteWorkHour(id: number) {
   }
 
   return { id };
-}
+};
 
-export async function fetchWorkHours() {
+export const addShift = async (dataToInsert: {}) => {
+  const { data, error } = await supabase
+    .from("work_hours")
+    .insert(dataToInsert)
+    .select();
+
+  return { data, error };
+};
+
+export const fetchShift = async () => {
   const { data, error } = await supabase.from("work_hours").select();
   if (error) throw error;
   return { data, error };
-}
+};

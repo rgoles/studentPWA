@@ -11,10 +11,7 @@ export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { shifts, error, isLoading } = useWorkHoursQuery();
 
-  console.log(shifts);
-
   if (error) return <div>Error {error.message}</div>;
-
   if (isLoading || !shifts) return <div>Loading...</div>;
 
   return (
@@ -23,10 +20,11 @@ export const ShiftsListScreen = () => {
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-foreground text-2xl font-semibold">
-            {"Worked Hours"}
+            {"My Shifts"}
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {"Track your daily work sessions"}
+          <p className="text-muted-foreground mt-1">
+            {"See your past shifts"}
+
           </p>
         </div>
       </div>
@@ -75,7 +73,7 @@ export const ShiftsListScreen = () => {
                 </div>
                 <button
                   onClick={() => remove.mutate(shift.id)}
-                  className="bg-accent text-foreground absolute -top-8 -right-7 rounded-full p-0.5"
+                  className="bg-accent text-foreground absolute -top-6 -right-6 rounded-full p-0.5"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

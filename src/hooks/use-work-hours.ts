@@ -1,21 +1,33 @@
-import { deleteWorkHour, fetchWorkHours } from "@/services/work-hour.service";
+import {
+  addShift,
+  deleteShift,
+  fetchShift,
+} from "@/services/work-hour.service";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 export function useWorkHoursMutations() {
   const qc = useQueryClient();
 
-  const remove = useMutation({
-    mutationFn: deleteWorkHour,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["work-hours-remove"] }),
+  const add = useMutation({
+    mutationFn: addShift,
   });
 
-  return { remove };
+  const remove = useMutation({
+    mutationFn: deleteShift,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["work-hours-list"] }),
+  });
+
+  return { add, remove };
 }
 
 export const useWorkHoursQuery = () => {
-  const { data:shifts, error, isLoading } = useQuery({
+  const {
+    data: shifts,
+    error,
+    isLoading,
+  } = useQuery({
     queryKey: ["work-hours-list"],
-    queryFn: fetchWorkHours,
+    queryFn: fetchShift,
   });
 
   return { shifts, isLoading, error };
