@@ -38,40 +38,41 @@ export const ShiftsListScreen = () => {
         ) : (
           shifts.data.map((shift) => (
             <Card key={shift.id} className="hover:bg-accent/50 p-4">
-              <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex flex-row justify-between gap-3 sm:items-center">
                 {/* Date section */}
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <CalendarIcon className="text-muted-foreground h-6 w-6 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-muted-foreground">Date</p>
-                    <p className="text-foreground truncate text-sm font-medium">
-                      {shift.shift_date}
-                    </p>
+                <div className="flex flex-col md:flex-1 gap-3 md:flex-row">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <CalendarIcon className="text-muted-foreground h-6 w-6 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-muted-foreground">Date</p>
+                      <p className="text-foreground truncate text-sm font-medium">
+                        {shift.shift_date}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                {/* Time section */}
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <ClockIcon className="text-muted-foreground h-6 w-6 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-muted-foreground">Time</p>
-                    <p className="font-mono text-sm">
-                      {shift.start_time} - {shift.end_time}
-                    </p>
+                  {/* Time section */}
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <ClockIcon className="text-muted-foreground h-6 w-6" />
+                    <div className="min-w-0">
+                      <p className="text-muted-foreground">Time</p>
+                      <p className="font-mono text-sm">
+                        {shift.start_time} - {shift.end_time}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Total hours */}
-                <div className="flex justify-end sm:justify-start">
-                  <Badge variant="outline" className="font-mono text-xs">
-                    {decimalToHours(shift.total_hours)} hours worked
-                  </Badge>
+                  {/* Total hours */}
+                  <div className="flex justify-start sm:justify-start">
+                    <Badge variant="outline" className="font-mono text-xs w-full">
+                      {decimalToHours(shift.total_hours)} hours worked
+                    </Badge>
+                  </div>
                 </div>
                 <button
                   onClick={() => remove.mutate(shift.id)}
                   className="bg-destructive text-primary-foreground cursor-pointer rounded p-1"
                 >
-                  <TrashIcon />
+                  <TrashIcon className="w-10 md:w-fit" />
                 </button>
               </div>
             </Card>
