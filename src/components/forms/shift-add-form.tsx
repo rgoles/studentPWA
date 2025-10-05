@@ -12,9 +12,18 @@ import { ChevronDownIcon } from "lucide-react";
 import type { Shift } from "@/types";
 import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
 import { useWorkHoursMutations } from "@/hooks/use-work-hours";
+import { AnimatePresence, motion } from "motion/react";
+
+const buttonCopy = {
+  idle: "Add Shift",
+  loading: "Loading...",
+  success: "Shift Added",
+} as const;
 
 export const ShiftAddForm = ({ userId }: { userId: string }) => {
   let stateMessage = "";
+  const [buttonState, setButtonState] =
+    useState<keyof typeof buttonCopy>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [shift, setShift] = useState<Shift>({
@@ -26,8 +35,31 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
   const { add } = useWorkHoursMutations();
 
+  // const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const calculatedTotalHours = calculateShiftDurationDecimal(
+  //     shift.start_time,
+  //     shift.end_time,
+  //   );
+
+  //   if (calculatedTotalHours <= 0) {
+  //     setErrorMessage("Worked Hours must be greater than 0");
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     ...shift,
+  //     total_hours: calculatedTotalHours,
+  //     user_id: userId,
+  //   };
+  //   setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
+  //   add.mutate(payload);
+  // };
+
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage("");
+
     const calculatedTotalHours = calculateShiftDurationDecimal(
       shift.start_time,
       shift.end_time,
@@ -38,13 +70,25 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
       return;
     }
 
+    // reflect pending state immediately
+    setButtonState("loading");
+
     const payload = {
       ...shift,
       total_hours: calculatedTotalHours,
       user_id: userId,
     };
     setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
-    add.mutate(payload);
+
+    try {
+      await add.mutateAsync(payload); // await real network call
+      setButtonState("success");
+      // briefly show success, then return to idle
+      setTimeout(() => setButtonState("idle"), 1500);
+    } catch (err: any) {
+      setErrorMessage(err?.message ?? "Something went wrong");
+      setButtonState("idle");
+    }
   };
 
   if (add.isPending) stateMessage = "Saving...";
@@ -134,8 +178,23 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
           </Popover>
         </div>
 
-        <Button className="w-full" type="submit">
-          Submit
+        <Button className="w-full" type="submit" asChild>
+          <button
+            className="blue-button"
+            disabled={buttonState === "loading"} // or: disabled={add.isPending}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={buttonState}
+                transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+                initial={{ y: -25, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 25, opacity: 0 }}
+              >
+                {buttonCopy[buttonState]}
+              </motion.span>
+            </AnimatePresence>
+          </button>
         </Button>
       </form>
       <p>{stateMessage}</p>

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestRouteImport } from './routes/test'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
@@ -17,6 +18,11 @@ import { Route as AuthAboutRouteImport } from './routes/_auth.about'
 import { Route as AuthShiftsListRouteImport } from './routes/_auth.shifts/list'
 import { Route as AuthShiftsAddRouteImport } from './routes/_auth.shifts/add'
 
+const TestRoute = TestRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -55,6 +61,7 @@ const AuthShiftsAddRoute = AuthShiftsAddRouteImport.update({
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/test': typeof TestRoute
   '/about': typeof AuthAboutRoute
   '/': typeof AuthIndexRoute
   '/shifts/add': typeof AuthShiftsAddRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/test': typeof TestRoute
   '/about': typeof AuthAboutRoute
   '/': typeof AuthIndexRoute
   '/shifts/add': typeof AuthShiftsAddRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/test': typeof TestRoute
   '/_auth/about': typeof AuthAboutRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/shifts/add': typeof AuthShiftsAddRoute
@@ -83,17 +92,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/login'
     | '/register'
+    | '/test'
     | '/about'
     | '/'
     | '/shifts/add'
     | '/shifts/list'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/register' | '/about' | '/' | '/shifts/add' | '/shifts/list'
+  to:
+    | '/login'
+    | '/register'
+    | '/test'
+    | '/about'
+    | '/'
+    | '/shifts/add'
+    | '/shifts/list'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/register'
+    | '/test'
     | '/_auth/about'
     | '/_auth/'
     | '/_auth/shifts/add'
@@ -104,10 +122,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  TestRoute: typeof TestRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -180,6 +206,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  TestRoute: TestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

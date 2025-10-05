@@ -6,6 +6,7 @@ import {
   useWorkHoursMutations,
   useWorkHoursQuery,
 } from "@/hooks/use-work-hours";
+import { motion } from "motion/react";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
