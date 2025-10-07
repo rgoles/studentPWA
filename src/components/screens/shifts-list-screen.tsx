@@ -15,14 +15,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { useState } from "react";
-import { boolean } from "zod";
 import { Button } from "../ui/button";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { shifts, error, isLoading } = useWorkHoursQuery();
-  const [isOpen, setOpen] = useState(false);
 
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
