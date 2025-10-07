@@ -16,7 +16,6 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { format } from "date-fns";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
@@ -24,7 +23,7 @@ export const ShiftsListScreen = () => {
 
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
-
+// TODO: Napravit layout za svaki page univerzalni, zato da mogu uracunt mobilni nav npr , da ne moram na svakoj componenti zasebno koristis
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 p-4">
       {/* Header */}
@@ -38,7 +37,7 @@ export const ShiftsListScreen = () => {
       </div>
 
       {/* Mobile-first list */}
-      <div className="space-y-3">
+      <div className="mb-28 space-y-3">
         {shifts.data.length === 0 ? (
           <Card className="p-6 text-center">
             <ClockIcon className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
@@ -59,8 +58,7 @@ export const ShiftsListScreen = () => {
                       <p className="text-foreground truncate text-sm font-medium">
                         {shift.shift_date}
                       </p>
-                      <p>{format(new Date(shift.shift_date + "T00:00:00"), "MMM dd, yyyy")}</p>
-                      
+                      {/* <p>{format(new Date(shift.shift_date + "T00:00:00"), "MMM dd, yyyy")}</p> */}
                     </div>
                   </div>
 
@@ -132,19 +130,18 @@ export const ShiftsListScreen = () => {
             </Card>
           ))
         )}
+        {/* Summary footer for mobile */}
+        {shifts.data.length > 0 && (
+          <Card className="bg-muted/30 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground text-sm">
+                {"Total Hours"}
+              </span>
+              <span className="text-foreground font-mono text-lg font-semibold"></span>
+            </div>
+          </Card>
+        )}
       </div>
-
-      {/* Summary footer for mobile */}
-      {shifts.data.length > 0 && (
-        <Card className="bg-muted/30 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-sm">
-              {"Total Hours"}
-            </span>
-            <span className="text-foreground font-mono text-lg font-semibold"></span>
-          </div>
-        </Card>
-      )}
     </div>
   );
 };

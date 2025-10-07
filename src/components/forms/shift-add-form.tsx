@@ -161,7 +161,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
         <Button className="w-full" type="submit" asChild>
           <button
             className="blue-button"
-            disabled={buttonState === "loading"} // or: disabled={add.isPending}
+            disabled={buttonState === "loading"}
           >
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span
