@@ -16,6 +16,8 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { format } from "date-fns";
+import { hr } from "date-fns/locale";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
@@ -23,7 +25,7 @@ export const ShiftsListScreen = () => {
 
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
-// TODO: Napravit layout za svaki page univerzalni, zato da mogu uracunt mobilni nav npr , da ne moram na svakoj componenti zasebno koristis
+  // TODO: Napravit layout za svaki page univerzalni, zato da mogu uracunt mobilni nav npr , da ne moram na svakoj componenti zasebno koristis
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 p-4">
       {/* Header */}
@@ -56,9 +58,11 @@ export const ShiftsListScreen = () => {
                     <div className="min-w-0">
                       <p className="text-muted-foreground">Date</p>
                       <p className="text-foreground truncate text-sm font-medium">
-                        {shift.shift_date}
+                        {format(
+                          new Date(shift.shift_date + "T00:00:00"),
+                          "dd.MM.yyyy",
+                        )}
                       </p>
-                      {/* <p>{format(new Date(shift.shift_date + "T00:00:00"), "MMM dd, yyyy")}</p> */}
                     </div>
                   </div>
 
@@ -119,13 +123,6 @@ export const ShiftsListScreen = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
-
-                {/* <button
-                  onClick={() => remove.mutate(shift.id)}
-                  className="bg-destructive text-primary-foreground cursor-pointer rounded p-1"
-                >
-                  <TrashIcon className="w-10 md:w-fit" />
-                </button> */}
               </div>
             </Card>
           ))
