@@ -42,7 +42,7 @@ export function AuthLayout() {
     <div className="m-2 mb-24 h-lvh">
       <h1>Authenticated Route</h1>
       <p>This route's content is only visible to authenticated users.</p>
-      <div className="bg-background z-50 border-t-secondary fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 justify-center border-t p-4 md:w-fit">
+      <div className="bg-background border-t-secondary fixed bottom-0 left-1/2 z-50 flex w-full -translate-x-1/2 justify-center border-t p-4 md:w-fit">
         <ul className="relative flex w-fit gap-1">
           <li>
             <Link
