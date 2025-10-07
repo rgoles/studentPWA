@@ -17,7 +17,6 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
-import { hr } from "date-fns/locale";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
