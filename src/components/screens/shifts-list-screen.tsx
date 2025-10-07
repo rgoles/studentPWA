@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { format } from "date-fns";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
@@ -58,6 +59,8 @@ export const ShiftsListScreen = () => {
                       <p className="text-foreground truncate text-sm font-medium">
                         {shift.shift_date}
                       </p>
+                      <p>{format(new Date(shift.shift_date + "T00:00:00"), "MMM dd, yyyy")}</p>
+                      
                     </div>
                   </div>
 

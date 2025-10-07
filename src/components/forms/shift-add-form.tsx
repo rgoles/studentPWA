@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
-import type { Shift } from "@/types";
 import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
 import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 import { AnimatePresence, motion } from "motion/react";
-
+import type { ShiftPayload, ShiftUIState } from "@/types";
+import { toYMD } from "@/lib/dateOnly";
 const buttonCopy = {
   idle: "Add Shift",
   loading: "Loading...",
@@ -26,7 +26,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
     useState<keyof typeof buttonCopy>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
-  const [shift, setShift] = useState<Shift>({
+  const [shift, setShift] = useState<ShiftUIState>({
     start_time: "00:00",
     end_time: "00:00",
     total_hours: null,
@@ -35,55 +35,38 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
   const { add } = useWorkHoursMutations();
 
-  // const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   const calculatedTotalHours = calculateShiftDurationDecimal(
-  //     shift.start_time,
-  //     shift.end_time,
-  //   );
-
-  //   if (calculatedTotalHours <= 0) {
-  //     setErrorMessage("Worked Hours must be greater than 0");
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     ...shift,
-  //     total_hours: calculatedTotalHours,
-  //     user_id: userId,
-  //   };
-  //   setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
-  //   add.mutate(payload);
-  // };
-
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
 
-    const calculatedTotalHours = calculateShiftDurationDecimal(
+    const hours = calculateShiftDurationDecimal(
       shift.start_time,
       shift.end_time,
     );
 
-    if (calculatedTotalHours <= 0) {
+    if (hours <= 0) {
       setErrorMessage("Worked Hours must be greater than 0");
       return;
     }
 
-    // reflect pending state immediately
+    if (!shift.shift_date) {
+      setErrorMessage("Please choose a date");
+      return;
+    }
+
     setButtonState("loading");
 
-    const payload = {
-      ...shift,
-      total_hours: calculatedTotalHours,
+    const payload: ShiftPayload = {
       user_id: userId,
+      start_time: shift.start_time,
+      end_time: shift.end_time,
+      total_hours: hours,
+      shift_date: toYMD(shift.shift_date),
     };
-    setShift((prev) => ({ ...prev, total_hours: calculatedTotalHours }));
 
     try {
-      await add.mutateAsync(payload); // await real network call
+      await add.mutateAsync(payload);
       setButtonState("success");
-      // briefly show success, then return to idle
       setTimeout(() => setButtonState("idle"), 1500);
     } catch (err: any) {
       setErrorMessage(err?.message ?? "Something went wrong");
@@ -91,9 +74,9 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
     }
   };
 
-  if (add.isPending) stateMessage = "Saving...";
-  else if (add.isError) stateMessage = `Error: ${add.error.message}`;
-  else if (add.isSuccess) stateMessage = "Saved successfully!";
+  // if (add.isPending) stateMessage = "Saving...";
+  // else if (add.isError) stateMessage = `Error: ${add.error.message}`;
+  // else if (add.isSuccess) stateMessage = "Saved successfully!";
 
   const dateLabel = shift.shift_date
     ? shift.shift_date.toLocaleDateString(undefined, {
@@ -118,10 +101,10 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             value={shift.start_time}
             onChange={(e) =>
-              setShift({
-                ...shift,
+              setShift((s) => ({
+                ...s,
                 start_time: e.target.value,
-              })
+              }))
             }
           />
         </div>
@@ -167,10 +150,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
                 selected={shift.shift_date || undefined}
                 captionLayout="dropdown"
                 onSelect={(date) => {
-                  setShift({
-                    ...shift,
-                    shift_date: date,
-                  });
+                  setShift((s) => ({ ...s, shift_date: date ?? null }));
                   setOpen(false);
                 }}
               />
