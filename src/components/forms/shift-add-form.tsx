@@ -12,8 +12,9 @@ import { ChevronDownIcon } from "lucide-react";
 import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
 import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 import { AnimatePresence, motion } from "motion/react";
-import type { ShiftPayload, ShiftUIState } from "@/types";
-import { toYMD } from "@/lib/dateOnly";
+import type { NewShift } from "@/types";
+import { format } from "date-fns";
+
 const buttonCopy = {
   idle: "Add Shift",
   loading: "Loading...",
@@ -26,11 +27,16 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
     useState<keyof typeof buttonCopy>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
-  const [shift, setShift] = useState<ShiftUIState>({
+  const [totalHours, setTotalHours] = useState<number>(0);
+  const [shift, setShift] = useState<NewShift>({
+    user_id: userId,
     start_time: "00:00",
     end_time: "00:00",
-    total_hours: null,
-    shift_date: new Date(),
+    shift_date: new Date().toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "numeric",
+      day: "2-digit",
+    }),
   });
 
   const { add } = useWorkHoursMutations();
@@ -49,6 +55,8 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
       return;
     }
 
+    setTotalHours(hours);
+
     if (!shift.shift_date) {
       setErrorMessage("Please choose a date");
       return;
@@ -56,12 +64,12 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
     setButtonState("loading");
 
-    const payload: ShiftPayload = {
-      user_id: userId,
+    const payload: NewShift = {
+      user_id: shift.user_id,
       start_time: shift.start_time,
       end_time: shift.end_time,
       total_hours: hours,
-      shift_date: toYMD(shift.shift_date),
+      shift_date: shift.shift_date,
     };
 
     try {
@@ -74,17 +82,17 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
     }
   };
 
-  // if (add.isPending) stateMessage = "Saving...";
-  // else if (add.isError) stateMessage = `Error: ${add.error.message}`;
-  // else if (add.isSuccess) stateMessage = "Saved successfully!";
+  if (add.isPending) stateMessage = "Saving...";
+  else if (add.isError) stateMessage = `Error: ${add.error.message}`;
+  else if (add.isSuccess) stateMessage = "Saved successfully!";
 
-  const dateLabel = shift.shift_date
-    ? shift.shift_date.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-      })
-    : "Select date";
+  // const dateLabel = shift.shift_date
+  //   ? shift.shift_date.toLocaleDateString(undefined, {
+  //       year: "numeric",
+  //       month: "short",
+  //       day: "2-digit",
+  //     })
+  //   : "Select date";
 
   return (
     <div className="mt-5">
@@ -137,7 +145,8 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
                 id="date-picker"
                 className="justify-between font-normal"
               >
-                <span>{dateLabel}</span>
+                {/*<span>{dateLabel}</span>*/}
+                <span>{shift.shift_date}</span>
                 <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
               </Button>
             </PopoverTrigger>
@@ -147,10 +156,14 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
             >
               <Calendar
                 mode="single"
-                selected={shift.shift_date || undefined}
+                selected={new Date(shift.shift_date)}
                 captionLayout="dropdown"
                 onSelect={(date) => {
-                  setShift((s) => ({ ...s, shift_date: date ?? null }));
+                  if (!date) return;
+                  setShift((s) => ({
+                    ...s,
+                    shift_date: format(date, "dd-MM-yyyy"),
+                  }));
                   setOpen(false);
                 }}
               />
@@ -159,10 +172,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
         </div>
 
         <Button className="w-full" type="submit" asChild>
-          <button
-            className="blue-button"
-            disabled={buttonState === "loading"}
-          >
+          <button className="blue-button" disabled={buttonState === "loading"}>
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span
                 key={buttonState}
@@ -180,7 +190,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
       <p>{stateMessage}</p>
       {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
-      <p>Total: {shift.total_hours ? `${shift.total_hours}` : "00:00"}</p>
+      <p>Total: {totalHours ? `${totalHours}` : "00:00"}</p>
       <p>Date: {shift.shift_date ? shift.shift_date.toLocaleString() : "—"}</p>
     </div>
   );

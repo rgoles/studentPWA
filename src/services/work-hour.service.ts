@@ -1,4 +1,5 @@
 import { supabase } from "@/config/supabase";
+import type { NewShift } from "@/types";
 
 export const deleteShift = async (id: number) => {
   const { error } = await supabase.from("work_hours").delete().eq("id", id);
@@ -12,10 +13,10 @@ export const deleteShift = async (id: number) => {
   return { id };
 };
 
-export const addShift = async (dataToInsert: {}) => {
+export const addShift = async (shift: NewShift) => {
   const { data, error } = await supabase
     .from("work_hours")
-    .insert(dataToInsert)
+    .insert(shift)
     .select();
 
   return { data, error };

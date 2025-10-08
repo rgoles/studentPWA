@@ -1,6 +1,10 @@
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
-import { CalendarIcon, ClockIcon, TrashIcon } from "@phosphor-icons/react";
+import {
+  CalendarIcon,
+  ClockIcon,
+  DotsThreeOutlineVerticalIcon,
+} from "@phosphor-icons/react";
 import { decimalToHours } from "@/lib/timeUtils";
 import {
   useWorkHoursMutations,
@@ -13,14 +17,23 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { format } from "date-fns";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { useState } from "react";
+import type { Shift } from "@/types";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { shifts, error, isLoading } = useWorkHoursQuery();
+  const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
@@ -57,10 +70,7 @@ export const ShiftsListScreen = () => {
                     <div className="min-w-0">
                       <p className="text-muted-foreground">Date</p>
                       <p className="text-foreground truncate text-sm font-medium">
-                        {format(
-                          new Date(shift.shift_date + "T00:00:00"),
-                          "dd.MM.yyyy",
-                        )}
+                        {shift.shift_date}
                       </p>
                     </div>
                   </div>
@@ -85,47 +95,70 @@ export const ShiftsListScreen = () => {
                     </Badge>
                   </div>
                 </div>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant={"destructive"}
-                      className="cursor-pointer rounded p-1"
-                    >
-                      <TrashIcon className="w-10 md:w-fit" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="outline">
+                      <DotsThreeOutlineVerticalIcon />
                     </Button>
-                  </DialogTrigger>
+                  </DropdownMenuTrigger>
 
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Are you absolutely sure?</DialogTitle>
-                      <DialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your account and remove your data from our
-                        servers.
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="flex justify-end gap-2">
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                          Close
-                        </Button>
-                      </DialogClose>
-                      <Button
-                        variant={"destructive"}
-                        onClick={() => remove.mutate(shift.id)}
-                        className="rounded px-3 py-1"
-                      >
-                        Confirm
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        console.log(shift);
+                        setSelectedShift(shift);
+                      }}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </Card>
           ))
         )}
+        <Dialog
+          open={!!selectedShift}
+          onOpenChange={(open) => !open && setSelectedShift(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogDescription>
+                {selectedShift?.start_time} - This action cannot be undone. This
+                will permanently delete your account and remove your data from
+                our servers.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  Close
+                </Button>
+              </DialogClose>
+              <Button
+                variant="destructive"
+                disabled={remove.isPending}
+                onClick={() => {
+                  if (!selectedShift) return;
+                  remove.mutate(selectedShift.id, {
+                    onSuccess: () => {
+                      setSelectedShift(null);
+                    },
+                  });
+                }}
+                className="rounded px-3 py-1"
+              >
+                {remove.isPending ? "Deleting..." : "Confirm"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         {/* Summary footer for mobile */}
         {shifts.data.length > 0 && (
           <Card className="bg-muted/30 p-4">
