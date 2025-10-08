@@ -51,7 +51,7 @@ export const ShiftsListScreen = () => {
       </div>
 
       {/* Mobile-first list */}
-      <div className="mb-28 space-y-3">
+      <div className="pb-28 space-y-3">
         {shifts.data.length === 0 ? (
           <Card className="p-6 text-center">
             <ClockIcon className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
@@ -97,10 +97,23 @@ export const ShiftsListScreen = () => {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <DotsThreeOutlineVerticalIcon />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Open shift actions"
+                      className="h-8 w-8"
+                    >
+                      <DotsThreeOutlineVerticalIcon className="h-5 w-5" />
+                    </Button>
                   </DropdownMenuTrigger>
 
-                  <DropdownMenuContent>
+                  <DropdownMenuContent
+                    side="top"
+                    align="end"
+                    sideOffset={8}
+                    collisionPadding={12}
+                    className="z-50"
+                  >
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
