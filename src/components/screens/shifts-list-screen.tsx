@@ -97,9 +97,7 @@ export const ShiftsListScreen = () => {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="icon" variant="outline">
-                      <DotsThreeOutlineVerticalIcon />
-                    </Button>
+                    <DotsThreeOutlineVerticalIcon />
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent>
