@@ -47,7 +47,7 @@ function BottomTabBar({
       className="bg-background/80 supports-[backdrop-filter]:bg-background/60 fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="mx-auto mt-2 grid h-16 max-w-screen-md grid-cols-4 items-stretch">
+      <div className="mx-auto grid h-20 max-w-screen-md grid-cols-4 items-center justify-center">
         {items.map((item, idx) => (
           <TabItem key={idx} {...item} />
         ))}
@@ -83,7 +83,7 @@ function TabItem({
       >
         {({ isActive }) => (
           <>
-            <Icon className={`h-5 w-5 ${isActive ? "" : "opacity-80"}`} />
+            <Icon className={`h-6 w-6 ${isActive ? "" : "opacity-80"}`} />
             <span>{label}</span>
             {isActive ? (
               <span className="bg-foreground/80 absolute inset-x-4 bottom-0 h-0.5 rounded-full" />
