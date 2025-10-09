@@ -27,13 +27,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Shift } from "@/types";
 
 export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { shifts, error, isLoading } = useWorkHoursQuery();
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
+  const items: Shift[] = (shifts?.data as Shift[]) ?? [];
+  const calculatedTotalHours = useMemo(
+    () => items.reduce((acc, s) => acc + Number(s.total_hours ?? 0), 0),
+    [items],
+  );
 
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
@@ -165,7 +170,8 @@ export const ShiftsListScreen = () => {
           <Card className="bg-muted/30 p-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground text-sm">
-                {"Total Hours"}
+                {"Total Hours: "}
+                {decimalToHours(calculatedTotalHours)}
               </span>
               <span className="text-foreground font-mono text-lg font-semibold"></span>
             </div>
