@@ -50,7 +50,7 @@ export const ShiftsListScreen = () => {
         </div>
       </div>
 
-      <div className="space-y-3 pb-28">
+      <div className="space-y-3">
         {shifts.data.length === 0 ? (
           <Card className="p-6 text-center">
             <ClockIcon className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
