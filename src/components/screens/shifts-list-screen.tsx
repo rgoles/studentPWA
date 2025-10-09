@@ -50,8 +50,7 @@ export const ShiftsListScreen = () => {
         </div>
       </div>
 
-      {/* Mobile-first list */}
-      <div className="pb-28 space-y-3">
+      <div className="space-y-3 pb-28">
         {shifts.data.length === 0 ? (
           <Card className="p-6 text-center">
             <ClockIcon className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
@@ -63,7 +62,6 @@ export const ShiftsListScreen = () => {
           shifts.data.map((shift) => (
             <Card key={shift.id} className="hover:bg-accent/50 p-4">
               <div className="flex flex-row justify-between gap-3 sm:items-center">
-                {/* Date section */}
                 <div className="flex flex-col gap-3 md:flex-1 md:flex-row">
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                     <CalendarIcon className="text-muted-foreground h-6 w-6 flex-shrink-0" />
@@ -75,7 +73,6 @@ export const ShiftsListScreen = () => {
                     </div>
                   </div>
 
-                  {/* Time section */}
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                     <ClockIcon className="text-muted-foreground h-6 w-6" />
                     <div className="min-w-0">
@@ -85,7 +82,6 @@ export const ShiftsListScreen = () => {
                       </p>
                     </div>
                   </div>
-                  {/* Total hours */}
                   <div className="flex justify-start sm:justify-start">
                     <Badge
                       variant="outline"
@@ -107,13 +103,7 @@ export const ShiftsListScreen = () => {
                     </Button>
                   </DropdownMenuTrigger>
 
-                  <DropdownMenuContent
-                    side="top"
-                    align="end"
-                    sideOffset={8}
-                    collisionPadding={12}
-                    className="z-50"
-                  >
+                  <DropdownMenuContent>
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
