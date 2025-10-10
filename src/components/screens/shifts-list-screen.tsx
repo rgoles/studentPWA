@@ -39,7 +39,7 @@ export const ShiftsListScreen = () => {
     () => items.reduce((acc, s) => acc + Number(s.total_hours ?? 0), 0),
     [items],
   );
-
+  console.log(shifts);
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
   // TODO: Napravit layout za svaki page univerzalni, zato da mogu uracunt mobilni nav npr , da ne moram na svakoj componenti zasebno koristis

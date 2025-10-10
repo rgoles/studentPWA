@@ -9,8 +9,10 @@ export type Shift = {
   user_id: string;
   start_time: string;
   end_time: string;
+  started_at_utc: Date;
+  ended_at_utc: Date;
   total_hours?: number | null;
-  shift_date: string;
+  shift_date: Date;
 };
 
 export type NewShift = Omit<Shift, "id">;

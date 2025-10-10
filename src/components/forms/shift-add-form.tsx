@@ -30,8 +30,10 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
   const [totalHours, setTotalHours] = useState<number>(0);
   const [shift, setShift] = useState<NewShift>({
     user_id: userId,
-    start_time: "00:00",
-    end_time: "00:00",
+    start_time: "",
+    end_time: "",
+    started_at_utc: new Date(),
+    ended_at_utc: new Date(),
     shift_date: new Date().toLocaleDateString(undefined, {
       year: "numeric",
       month: "numeric",
@@ -41,21 +43,36 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
   const { add } = useWorkHoursMutations();
 
+  function convertTimeToTimestamp(timeToConvert: NewShift) {
+    const [yearStr, monthStr, dayStr] = timeToConvert.shift_date.split("-");
+    const [hourStr, minuteStr = "0"] = timeToConvert.start_time.split(":");
+
+    const year = Number(yearStr);
+    const monthIndex = Number(monthStr) - 1; // 0-based!
+    const day = Number(dayStr);
+    const hour = Number(hourStr);
+    const minute = Number(minuteStr);
+
+    const dt = new Date(year, monthIndex, day, hour, minute);
+
+    console.log(dt);
+  }
+
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
+    convertTimeToTimestamp(shift);
+    // const hours = calculateShiftDurationDecimal(
+    //   shift.start_time,
+    //   shift.end_time,
+    // );
 
-    const hours = calculateShiftDurationDecimal(
-      shift.start_time,
-      shift.end_time,
-    );
+    // if (hours <= 0) {
+    //   setErrorMessage("Worked Hours must be greater than 0");
+    //   return;
+    // }
 
-    if (hours <= 0) {
-      setErrorMessage("Worked Hours must be greater than 0");
-      return;
-    }
-
-    setTotalHours(hours);
+    // setTotalHours(hours);
 
     if (!shift.shift_date) {
       setErrorMessage("Please choose a date");
@@ -66,9 +83,8 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
     const payload: NewShift = {
       user_id: shift.user_id,
-      start_time: shift.start_time,
-      end_time: shift.end_time,
-      total_hours: hours,
+      started_at_utc: shift.started_at_utc,
+      ended_at_utc: shift.ended_at_utc,
       shift_date: shift.shift_date,
     };
 
@@ -146,7 +162,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
                 className="justify-between font-normal"
               >
                 {/*<span>{dateLabel}</span>*/}
-                <span>{shift.shift_date}</span>
+                {/* <span>{shift.shift_date}</span> */}
                 <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
               </Button>
             </PopoverTrigger>
@@ -156,13 +172,13 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
             >
               <Calendar
                 mode="single"
-                selected={new Date(shift.shift_date)}
+                selected={new Date()}
                 captionLayout="dropdown"
                 onSelect={(date) => {
                   if (!date) return;
                   setShift((s) => ({
                     ...s,
-                    shift_date: format(date, "dd-MM-yyyy"),
+                    shift_date: date,
                   }));
                   setOpen(false);
                 }}
