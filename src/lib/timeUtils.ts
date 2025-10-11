@@ -1,20 +1,46 @@
-export const calculateShiftDurationDecimal = (
-  startShift: string,
-  endShift: string,
-): number => {
-  const [sh, sm] = startShift.split(":").map(Number);
-  const [eh, em] = endShift.split(":").map(Number);
+import type { Shift } from "@/types";
 
-  const startMin = sh * 60 + sm;
-  let endMin = eh * 60 + em;
+export const convertTimeToTimestamp = (shift: Shift) => {
+  if (!shift.shift_date) throw new Error("Missing shift_date");
 
-  if (endMin < startMin) endMin += 24 * 60;
+  const date = new Date(shift.shift_date);
 
-  const totalMinutes = endMin - startMin;
-  // const hours = Math.floor(totalMinutes / 60);
-  // const minutes = totalMinutes % 60;
-  const decimalHours = Math.round((totalMinutes / 60) * 100) / 100;
-  return decimalHours;
+  const [startHourStr = "0", startMinuteStr = "0"] = (
+    shift.start_shift ?? ""
+  ).split(":");
+  const [endHourStr = "0", endMinuteStr = "0"] = (shift.end_shift ?? "").split(
+    ":",
+  );
+
+  const startHour = Number(startHourStr);
+  const startMinute = Number(startMinuteStr);
+  const endHour = Number(endHourStr);
+  const endMinute = Number(endMinuteStr);
+
+  const startDateTime = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    startHour,
+    startMinute,
+  );
+
+  const endDateTime = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    endHour,
+    endMinute,
+  );
+
+  if (startDateTime > endDateTime) {
+    startDateTime.setDate(startDateTime.getDate() - 1);
+  }
+
+  return {
+    started_at_utc: startDateTime,
+    ended_at_utc: endDateTime,
+  };
 };
 
 export const decimalToHours = (decimalHours: number): string => {

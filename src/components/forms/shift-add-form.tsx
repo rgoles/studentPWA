@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
-import { calculateShiftDurationDecimal } from "@/lib/timeUtils";
 import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 import { AnimatePresence, motion } from "motion/react";
-import type { NewShift } from "@/types";
 import { format } from "date-fns";
+import type { Shift } from "@/types";
+import { convertTimeToTimestamp } from "@/lib/timeUtils.ts";
 
 const buttonCopy = {
   idle: "Add Shift",
@@ -27,52 +27,23 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
     useState<keyof typeof buttonCopy>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
-  const [totalHours, setTotalHours] = useState<number>(0);
-  const [shift, setShift] = useState<NewShift>({
+
+  const [shift, setShift] = useState<Shift>({
     user_id: userId,
-    start_time: "",
-    end_time: "",
+    start_shift: "00:00",
+    end_shift: "00:00",
     started_at_utc: new Date(),
     ended_at_utc: new Date(),
-    shift_date: new Date().toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "numeric",
-      day: "2-digit",
-    }),
+    shift_date: new Date(),
   });
 
   const { add } = useWorkHoursMutations();
 
-  function convertTimeToTimestamp(timeToConvert: NewShift) {
-    const [yearStr, monthStr, dayStr] = timeToConvert.shift_date.split("-");
-    const [hourStr, minuteStr = "0"] = timeToConvert.start_time.split(":");
-
-    const year = Number(yearStr);
-    const monthIndex = Number(monthStr) - 1; // 0-based!
-    const day = Number(dayStr);
-    const hour = Number(hourStr);
-    const minute = Number(minuteStr);
-
-    const dt = new Date(year, monthIndex, day, hour, minute);
-
-    console.log(dt);
-  }
-
   const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
-    convertTimeToTimestamp(shift);
-    // const hours = calculateShiftDurationDecimal(
-    //   shift.start_time,
-    //   shift.end_time,
-    // );
 
-    // if (hours <= 0) {
-    //   setErrorMessage("Worked Hours must be greater than 0");
-    //   return;
-    // }
-
-    // setTotalHours(hours);
+    const { started_at_utc, ended_at_utc } = convertTimeToTimestamp(shift);
 
     if (!shift.shift_date) {
       setErrorMessage("Please choose a date");
@@ -81,11 +52,16 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
     setButtonState("loading");
 
-    const payload: NewShift = {
+    const payload: Shift = {
       user_id: shift.user_id,
-      started_at_utc: shift.started_at_utc,
-      ended_at_utc: shift.ended_at_utc,
-      shift_date: shift.shift_date,
+      // ovo se ne treba slat uopce u bazu
+      // start_time: shift.start_time,
+      // end_time: shift.end_time,
+
+      started_at_utc: started_at_utc,
+      ended_at_utc: ended_at_utc,
+      // shift_date se takodjer ne treba slat u bazu
+      // shift_date: shift.shift_date,
     };
 
     try {
@@ -110,6 +86,10 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
   //     })
   //   : "Select date";
 
+  const dateLabel = shift.shift_date
+    ? format(shift.shift_date, "PPP")
+    : "Select date";
+
   return (
     <div className="mt-5">
       <form
@@ -123,11 +103,11 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
             placeholder="Shift Start"
             name="shiftStart"
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-            value={shift.start_time}
+            value={shift.start_shift}
             onChange={(e) =>
               setShift((s) => ({
                 ...s,
-                start_time: e.target.value,
+                start_shift: e.target.value,
               }))
             }
           />
@@ -140,19 +120,19 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
             placeholder="Shift End"
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             name="shiftEnd"
-            value={shift.end_time}
+            value={shift.end_shift}
             onChange={(e) =>
-              setShift({
-                ...shift,
-                end_time: e.target.value,
-              })
+              setShift((s) => ({
+                ...s,
+                end_shift: e.target.value,
+              }))
             }
           />
         </div>
 
         <div className="flex flex-col space-y-2">
           <Label htmlFor="date-picker" className="px-1">
-            Date
+            Datum kraja smjene
           </Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -161,8 +141,7 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
                 id="date-picker"
                 className="justify-between font-normal"
               >
-                {/*<span>{dateLabel}</span>*/}
-                {/* <span>{shift.shift_date}</span> */}
+                <span>{dateLabel}</span>
                 <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
               </Button>
             </PopoverTrigger>
@@ -172,12 +151,12 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
             >
               <Calendar
                 mode="single"
-                selected={new Date()}
+                selected={shift.shift_date}
                 captionLayout="dropdown"
                 onSelect={(date) => {
                   if (!date) return;
-                  setShift((s) => ({
-                    ...s,
+                  setShift((p) => ({
+                    ...p,
                     shift_date: date,
                   }));
                   setOpen(false);
@@ -206,7 +185,6 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
       <p>{stateMessage}</p>
       {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
-      <p>Total: {totalHours ? `${totalHours}` : "00:00"}</p>
       <p>Date: {shift.shift_date ? shift.shift_date.toLocaleString() : "—"}</p>
     </div>
   );

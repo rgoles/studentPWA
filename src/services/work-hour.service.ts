@@ -1,8 +1,8 @@
 import { supabase } from "@/config/supabase";
-import type { NewShift } from "@/types";
+import type { Shift } from "@/types";
 
 export const deleteShift = async (id: number) => {
-  const { error } = await supabase.from("work_hours").delete().eq("id", id);
+  const { error } = await supabase.from("shifts").delete().eq("id", id);
 
   if (error) {
     throw new Error(
@@ -13,17 +13,14 @@ export const deleteShift = async (id: number) => {
   return { id };
 };
 
-export const addShift = async (shift: NewShift) => {
-  const { data, error } = await supabase
-    .from("work_hours")
-    .insert(shift)
-    .select();
+export const addShift = async (shift: Shift) => {
+  const { data, error } = await supabase.from("shifts").insert(shift).select();
 
   return { data, error };
 };
 
 export const fetchShift = async () => {
-  const { data, error } = await supabase.from("work_hours").select();
+  const { data, error } = await supabase.from("shifts_with_hours").select();
   if (error) throw error;
   return { data, error };
 };

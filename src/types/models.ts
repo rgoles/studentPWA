@@ -5,16 +5,18 @@ import type z from "zod";
 //  da koristi zod za validaciju i da koristi react-hook-form
 
 export type Shift = {
-  id: number;
+  id?: number;
   user_id: string;
-  start_time: string;
-  end_time: string;
+
+  hours_worked?: number;
+
+  start_shift?: string;
+  end_shift?: string;
+
   started_at_utc: Date;
   ended_at_utc: Date;
   total_hours?: number | null;
-  shift_date: Date;
+  shift_date?: Date;
 };
-
-export type NewShift = Omit<Shift, "id">;
 
 export type UserLoginType = z.infer<typeof UserLoginSchema>;

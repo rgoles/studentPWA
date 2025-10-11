@@ -36,10 +36,11 @@ export const ShiftsListScreen = () => {
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
   const items: Shift[] = (shifts?.data as Shift[]) ?? [];
   const calculatedTotalHours = useMemo(
-    () => items.reduce((acc, s) => acc + Number(s.total_hours ?? 0), 0),
+    () => items.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0),
     [items],
   );
   console.log(shifts);
+  console.log(new Date(shifts?.data[0].started_at_utc));
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
   // TODO: Napravit layout za svaki page univerzalni, zato da mogu uracunt mobilni nav npr , da ne moram na svakoj componenti zasebno koristis
@@ -64,7 +65,7 @@ export const ShiftsListScreen = () => {
             </p>
           </Card>
         ) : (
-          shifts.data.map((shift) => (
+          shifts.data.map((shift: Shift) => (
             <Card key={shift.id} className="hover:bg-accent/50 p-4">
               <div className="flex flex-row justify-between gap-3 sm:items-center">
                 <div className="flex flex-col gap-3 md:flex-1 md:flex-row">
@@ -73,7 +74,9 @@ export const ShiftsListScreen = () => {
                     <div className="min-w-0">
                       <p className="text-muted-foreground">Date</p>
                       <p className="text-foreground truncate text-sm font-medium">
-                        {shift.shift_date}
+                        {new Date(shift.ended_at_utc).toLocaleDateString(
+                          "hr-HR",
+                        )}
                       </p>
                     </div>
                   </div>
@@ -83,7 +86,21 @@ export const ShiftsListScreen = () => {
                     <div className="min-w-0">
                       <p className="text-muted-foreground">Time</p>
                       <p className="text-foreground truncate text-sm font-medium">
-                        {shift.start_time} - {shift.end_time}
+                        {String(
+                          new Date(shift.started_at_utc).getHours(),
+                        ).padStart(2, "0")}
+                        :
+                        {String(
+                          new Date(shift.started_at_utc).getMinutes(),
+                        ).padStart(2, "0")}{" "}
+                        :{" "}
+                        {String(
+                          new Date(shift.ended_at_utc).getHours(),
+                        ).padStart(2, "0")}
+                        :
+                        {String(
+                          new Date(shift.ended_at_utc).getMinutes(),
+                        ).padStart(2, "0")}
                       </p>
                     </div>
                   </div>
@@ -92,7 +109,7 @@ export const ShiftsListScreen = () => {
                       variant="outline"
                       className="w-full font-mono text-sm"
                     >
-                      {decimalToHours(shift.total_hours)} hours worked
+                      {decimalToHours(shift.hours_worked ?? 0)} hours worked
                     </Badge>
                   </div>
                 </div>
@@ -135,9 +152,9 @@ export const ShiftsListScreen = () => {
             <DialogHeader>
               <DialogTitle>Are you absolutely sure?</DialogTitle>
               <DialogDescription>
-                {selectedShift?.start_time} - This action cannot be undone. This
-                will permanently delete your account and remove your data from
-                our servers.
+                {selectedShift?.start_shift} - This action cannot be undone.
+                This will permanently delete your account and remove your data
+                from our servers.
               </DialogDescription>
             </DialogHeader>
 
@@ -151,7 +168,7 @@ export const ShiftsListScreen = () => {
                 variant="destructive"
                 disabled={remove.isPending}
                 onClick={() => {
-                  if (!selectedShift) return;
+                  if (!selectedShift || !selectedShift.id) return;
                   remove.mutate(selectedShift.id, {
                     onSuccess: () => {
                       setSelectedShift(null);
@@ -170,7 +187,6 @@ export const ShiftsListScreen = () => {
           <Card className="bg-muted/30 p-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground text-sm">
-                {"Total Hours: "}
                 {decimalToHours(calculatedTotalHours)}
               </span>
               <span className="text-foreground font-mono text-lg font-semibold"></span>
