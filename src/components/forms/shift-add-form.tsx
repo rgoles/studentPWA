@@ -21,7 +21,13 @@ const buttonCopy = {
   success: "Shift Added",
 } as const;
 
-export const ShiftAddForm = ({ userId }: { userId: string }) => {
+export const ShiftAddForm = ({
+  userId,
+  onSuccess,
+}: {
+  userId: string;
+  onSuccess: any;
+}) => {
   let stateMessage = "";
   const [buttonState, setButtonState] =
     useState<keyof typeof buttonCopy>("idle");
@@ -54,19 +60,14 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
 
     const payload: Shift = {
       user_id: shift.user_id,
-      // ovo se ne treba slat uopce u bazu
-      // start_time: shift.start_time,
-      // end_time: shift.end_time,
-
       started_at_utc: started_at_utc,
       ended_at_utc: ended_at_utc,
-      // shift_date se takodjer ne treba slat u bazu
-      // shift_date: shift.shift_date,
     };
 
     try {
       await add.mutateAsync(payload);
       setButtonState("success");
+      if (onSuccess) onSuccess();
       setTimeout(() => setButtonState("idle"), 1500);
     } catch (err: any) {
       setErrorMessage(err?.message ?? "Something went wrong");
@@ -78,20 +79,12 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
   else if (add.isError) stateMessage = `Error: ${add.error.message}`;
   else if (add.isSuccess) stateMessage = "Saved successfully!";
 
-  // const dateLabel = shift.shift_date
-  //   ? shift.shift_date.toLocaleDateString(undefined, {
-  //       year: "numeric",
-  //       month: "short",
-  //       day: "2-digit",
-  //     })
-  //   : "Select date";
-
   const dateLabel = shift.shift_date
     ? format(shift.shift_date, "PPP")
     : "Select date";
 
   return (
-    <div className="mt-5">
+    <>
       <form
         className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
         onSubmit={onSubmitFunc}
@@ -186,6 +179,6 @@ export const ShiftAddForm = ({ userId }: { userId: string }) => {
       {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
       <p>Date: {shift.shift_date ? shift.shift_date.toLocaleString() : "—"}</p>
-    </div>
+    </>
   );
 };

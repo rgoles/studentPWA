@@ -25,10 +25,11 @@ export const useWorkHoursQuery = () => {
     data: shifts,
     error,
     isLoading,
+    refetch,
   } = useQuery({
     queryKey: ["work-hours-list"],
     queryFn: fetchShift,
   });
 
-  return { shifts, isLoading, error };
+  return { refetch, shifts, isLoading, error };
 };

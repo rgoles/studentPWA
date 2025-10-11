@@ -15,7 +15,6 @@ export const deleteShift = async (id: number) => {
 
 export const addShift = async (shift: Shift) => {
   const { data, error } = await supabase.from("shifts").insert(shift).select();
-
   return { data, error };
 };
 
