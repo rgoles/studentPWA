@@ -13,9 +13,7 @@ import {
 
 export const Route = createFileRoute("/_auth")({
   beforeLoad: async ({ context, location }) => {
-    // Check if user is authenticated
     if (!context.auth.isSignedIn) {
-      console.log("User not authenticated, redirecting to login...");
       throw redirect({
         to: "/login",
         search: {

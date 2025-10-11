@@ -45,12 +45,9 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       if (session?.user) {
         setUser(session.user);
         setIsSignedIn(true);
-        console.log(session.user.id);
-        console.log("signed in");
       } else {
         setUser(null);
         setIsSignedIn(false);
-        console.log("not signed in");
       }
       setIsInitialLoading(false);
     });

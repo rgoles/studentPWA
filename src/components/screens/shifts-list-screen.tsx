@@ -34,13 +34,11 @@ export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { shifts, error, isLoading } = useWorkHoursQuery();
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
-  const items: Shift[] = (shifts?.data as Shift[]) ?? [];
+  const items = (shifts?.data as Shift[]) ?? [];
   const calculatedTotalHours = useMemo(
     () => items.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0),
     [items],
   );
-  console.log(shifts);
-  console.log(new Date(shifts?.data[0].started_at_utc));
   if (error) return <div>Error {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
   // TODO: Napravit layout za svaki page univerzalni, zato da mogu uracunt mobilni nav npr , da ne moram na svakoj componenti zasebno koristis
@@ -131,7 +129,6 @@ export const ShiftsListScreen = () => {
                     <DropdownMenuItem
                       onSelect={(e) => {
                         e.preventDefault();
-                        console.log(shift);
                         setSelectedShift(shift);
                       }}
                     >

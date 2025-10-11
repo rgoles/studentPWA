@@ -12,7 +12,7 @@ import { useState } from "react";
 import { signUpNewUser } from "@/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { AuthError } from "@supabase/supabase-js";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import type z from "zod";
 import { UserLoginSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,7 +49,6 @@ export function RegisterForm({
     const { error } = await signUpNewUser(data.email, data.password);
     if (!error) {
       navigate({ to: "/login", replace: true });
-      console.log("DATA:", data);
     } else {
       setIsLoading(false);
       setError(error);
