@@ -99,7 +99,7 @@ export const ShiftsListScreen = () => {
             <PlusIcon />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-fit sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add shift</DialogTitle>
             <DialogDescription>Enter your shift details.</DialogDescription>

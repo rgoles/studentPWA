@@ -56,6 +56,11 @@ export const ShiftAddForm = ({
       return;
     }
 
+    if (!shift.shift_date) {
+      setErrorMessage("Please choose a date");
+      return;
+    }
+
     setButtonState("loading");
 
     const payload: Shift = {
