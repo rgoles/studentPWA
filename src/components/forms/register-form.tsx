@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { signUpNewUser } from "@/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { AuthError } from "@supabase/supabase-js";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import type z from "zod";
 import { UserLoginSchema } from "@/lib/validation";
@@ -31,7 +30,6 @@ export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [error, setError] = useState<AuthError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate({ from: "/register" });
 
@@ -46,12 +44,17 @@ export function RegisterForm({
   const onSubmit: SubmitHandler<UserLoginType> = async (data) => {
     setIsLoading(true);
 
-    const { error } = await signUpNewUser(data.email, data.password);
-    if (!error) {
+    try {
+      await signUpNewUser(data.email, data.password);
+      
+      // Success - navigate to login
       navigate({ to: "/login", replace: true });
-    } else {
+    } catch (err: any) {
+      form.setError("root", {
+        type: "manual",
+        message: err?.message ?? "Something went wrong"
+      });
       setIsLoading(false);
-      setError(error);
     }
   };
 
@@ -102,6 +105,14 @@ export function RegisterForm({
                     </FormItem>
                   )}
                 />{" "}
+                
+                {/* Show form errors */}
+                {form.formState.errors.root && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
+
                 <div className="flex flex-col gap-3">
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading ? "Loading..." : "Register"}
@@ -121,11 +132,6 @@ export function RegisterForm({
           </Form>
         </CardContent>
       </Card>
-      {error && (
-        <div className="text-center text-xs text-balance text-red-500">
-          {error.message}
-        </div>
-      )}
     </div>
   );
 }

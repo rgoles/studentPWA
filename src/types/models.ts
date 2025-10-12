@@ -1,22 +1,29 @@
-import type { UserLoginSchema } from "@/lib/validation";
+import type { UserLoginSchema, ShiftSchema } from "@/lib/validation";
 import type z from "zod";
 
-// TODO: Pregledat sve tipove i modele koje sam definirao, prepravit shift-add-formu
-//  da koristi zod za validaciju i da koristi react-hook-form
+// Database model - what comes from Supabase
+export type ShiftRecord = {
+  id: number;
+  user_id: string;
+  started_at_utc: string; // ISO string from DB
+  ended_at_utc: string;   // ISO string from DB
+  hours_worked?: number;
+  // total_hours?: number | null;
+};
 
+// Application model - what we use in components
 export type Shift = {
   id?: number;
   user_id: string;
-
-  hours_worked?: number;
-
-  start_shift?: string;
-  end_shift?: string;
-
   started_at_utc: Date;
   ended_at_utc: Date;
-  total_hours?: number | null;
-  shift_date?: Date;
+  hours_worked?: number;
+  // total_hours?: number | null;
+
+  start_shift?: string;  
+  end_shift?: string;    
+  shift_date?: Date;     
 };
 
 export type UserLoginType = z.infer<typeof UserLoginSchema>;
+export type ShiftFormType = z.infer<typeof ShiftSchema>;

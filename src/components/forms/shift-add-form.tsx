@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -11,9 +10,20 @@ import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
 import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 import { AnimatePresence, motion } from "motion/react";
-import { format } from "date-fns";
-import type { Shift } from "@/types";
-import { convertTimeToTimestamp } from "@/lib/timeUtils.ts";
+import type { Shift, ShiftFormType } from "@/types";
+import { convertTimeToTimestamp } from "@/lib/timeUtils";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ShiftSchema } from "@/lib/validation";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import type { z } from "zod";
 
 const buttonCopy = {
   idle: "Add Shift",
@@ -26,164 +36,174 @@ export const ShiftAddForm = ({
   onSuccess,
 }: {
   userId: string;
-  onSuccess: any;
+  onSuccess?: () => void;
 }) => {
-  let stateMessage = "";
   const [buttonState, setButtonState] =
     useState<keyof typeof buttonCopy>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
-
-  const [shift, setShift] = useState<Shift>({
-    user_id: userId,
-    start_shift: "00:00",
-    end_shift: "00:00",
-    started_at_utc: new Date(),
-    ended_at_utc: new Date(),
-    shift_date: new Date(),
-  });
 
   const { add } = useWorkHoursMutations();
 
-  const onSubmitFunc = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrorMessage("");
+  const form = useForm<z.infer<typeof ShiftSchema>>({
+    resolver: zodResolver(ShiftSchema),
+    defaultValues: {
+      start_shift: "07:00",
+      end_shift: "15:00",
+      shift_date: new Date(),
+    },
+  });
 
-    const { started_at_utc, ended_at_utc } = convertTimeToTimestamp(shift);
-
-    if (!shift.shift_date) {
-      setErrorMessage("Please choose a date");
-      return;
-    }
-
-    if (!shift.shift_date) {
-      setErrorMessage("Please choose a date");
-      return;
-    }
-
+  const handleSubmit: SubmitHandler<ShiftFormType> = async (data) => {
     setButtonState("loading");
 
-    const payload: Shift = {
-      user_id: shift.user_id,
-      started_at_utc: started_at_utc,
-      ended_at_utc: ended_at_utc,
-    };
-
     try {
+        
+      const tempShift: Shift = {
+        user_id: userId,
+        start_shift: data.start_shift,
+        end_shift: data.end_shift,
+        shift_date: data.shift_date,
+        started_at_utc: new Date(),
+        ended_at_utc: new Date(),
+      };
+
+      const { started_at_utc, ended_at_utc } = convertTimeToTimestamp(tempShift);
+
+      const payload: Shift = {
+        user_id: userId,
+        started_at_utc,
+        ended_at_utc,
+      };
+
       await add.mutateAsync(payload);
       setButtonState("success");
+      
+      // Reset form after successful submission
+      form.reset();
+      
       if (onSuccess) onSuccess();
       setTimeout(() => setButtonState("idle"), 1500);
     } catch (err: any) {
-      setErrorMessage(err?.message ?? "Something went wrong");
+      form.setError("root", {
+        type: "manual",
+        message: err?.message ?? "Something went wrong"
+      });
       setButtonState("idle");
     }
   };
 
-  if (add.isPending) stateMessage = "Saving...";
-  else if (add.isError) stateMessage = `Error: ${add.error.message}`;
-  else if (add.isSuccess) stateMessage = "Saved successfully!";
-
-  const dateLabel = shift.shift_date
-    ? format(shift.shift_date, "PPP")
+  const watchedDate = form.watch("shift_date");
+  const dateLabel = watchedDate
+    ? watchedDate.toLocaleDateString("hr-HR", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      })
     : "Select date";
 
   return (
-    <>
+    <Form {...form}>
       <form
         className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
-        onSubmit={onSubmitFunc}
+        onSubmit={form.handleSubmit(handleSubmit)}
       >
-        <div className="space-y-2">
-          <Label htmlFor="shiftStart">Shift Start</Label>
-          <Input
-            type="time"
-            placeholder="Shift Start"
-            name="shiftStart"
-            className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-            value={shift.start_shift}
-            onChange={(e) =>
-              setShift((s) => ({
-                ...s,
-                start_shift: e.target.value,
-              }))
-            }
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="start_shift"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shift Start</FormLabel>
+              <FormControl>
+                <Input
+                  type="time"
+                  placeholder="Shift Start"
+                  className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="shiftEnd">Shift End</Label>
-          <Input
-            type="time"
-            placeholder="Shift End"
-            className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-            name="shiftEnd"
-            value={shift.end_shift}
-            onChange={(e) =>
-              setShift((s) => ({
-                ...s,
-                end_shift: e.target.value,
-              }))
-            }
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="end_shift"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Shift End</FormLabel>
+              <FormControl>
+                <Input
+                  type="time"
+                  placeholder="Shift End"
+                  className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="flex flex-col space-y-2">
-          <Label htmlFor="date-picker" className="px-1">
-            Datum kraja smjene
-          </Label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="date-picker"
-                className="justify-between font-normal"
-              >
-                <span>{dateLabel}</span>
-                <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
+        <FormField
+          control={form.control}
+          name="shift_date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col space-y-2">
+              <FormLabel className="px-1">Datum kraja smjene</FormLabel>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      className="justify-between font-normal"
+                    >
+                      <span>{dateLabel}</span>
+                      <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto overflow-hidden p-0"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    captionLayout="dropdown"
+                    onSelect={(date) => {
+                      if (!date) return;
+                      field.onChange(date);
+                      setOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {form.formState.errors.root && (
+          <p className="text-sm text-red-600">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+
+        <Button className="w-full" type="submit" disabled={buttonState === "loading"}>
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span
+              key={buttonState}
+              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+              initial={{ y: -25, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 25, opacity: 0 }}
             >
-              <Calendar
-                mode="single"
-                selected={shift.shift_date}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  if (!date) return;
-                  setShift((p) => ({
-                    ...p,
-                    shift_date: date,
-                  }));
-                  setOpen(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <Button className="w-full" type="submit" asChild>
-          <button className="blue-button" disabled={buttonState === "loading"}>
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={buttonState}
-                transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-                initial={{ y: -25, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 25, opacity: 0 }}
-              >
-                {buttonCopy[buttonState]}
-              </motion.span>
-            </AnimatePresence>
-          </button>
+              {buttonCopy[buttonState]}
+            </motion.span>
+          </AnimatePresence>
         </Button>
       </form>
-      <p>{stateMessage}</p>
-      {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
-
-      <p>Date: {shift.shift_date ? shift.shift_date.toLocaleString() : "—"}</p>
-    </>
+    </Form>
   );
 };

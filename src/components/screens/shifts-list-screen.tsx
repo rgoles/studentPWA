@@ -4,22 +4,12 @@ import {
   CalendarIcon,
   ClockIcon,
   DotsThreeOutlineVerticalIcon,
-  PlusIcon,
 } from "@phosphor-icons/react";
 import { decimalToHours } from "@/lib/timeUtils";
 import {
   useWorkHoursMutations,
   useWorkHoursQuery,
 } from "@/hooks/use-work-hours";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -31,19 +21,10 @@ import {
 } from "../ui/dropdown-menu";
 import { useMemo, useState } from "react";
 import type { Shift } from "@/types";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
-import { ShiftAddForm } from "@/components/forms/shift-add-form.tsx";
+import { AddShiftLauncher } from "@/components/ui/add-shift-launcher";
 import { useAuth } from "@/auth";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export const ShiftsListScreen = () => {
   const { user } = useAuth();
@@ -54,7 +35,7 @@ export const ShiftsListScreen = () => {
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
   const [open, setOpen] = useState(false);
 
-  const items = (shifts?.data as Shift[]) ?? [];
+  const items = (shifts as Shift[]) ?? [];
   const calculatedTotalHours = useMemo(
     () => items.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0),
     [items],
@@ -69,45 +50,6 @@ export const ShiftsListScreen = () => {
   if (isLoading || !shifts) return <div>Loading...</div>;
   if (!user) return <p>You must login</p>;
 
-  const AddShiftLauncher = () =>
-    isMobile ? (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>
-          <Button variant="outline" onClick={() => setOpen(true)}>
-            <PlusIcon />
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader className="text-left">
-            <DrawerTitle>Add shift</DrawerTitle>
-            <DrawerDescription>Enter your shift details.</DrawerDescription>
-          </DrawerHeader>
-          <div className="mx-5">
-            <ShiftAddForm userId={user.id} onSuccess={handleAddShiftSuccess} />
-          </div>
-          <DrawerFooter className="mb-8 pt-2">
-            <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    ) : (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" onClick={() => setOpen(true)}>
-            <PlusIcon />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="w-fit sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add shift</DialogTitle>
-            <DialogDescription>Enter your shift details.</DialogDescription>
-          </DialogHeader>
-          <ShiftAddForm userId={user.id} onSuccess={handleAddShiftSuccess} />
-        </DialogContent>
-      </Dialog>
-    );
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 p-4">
@@ -120,7 +62,13 @@ export const ShiftsListScreen = () => {
             </h1>
             <p className="text-muted-foreground mt-1">See your past shifts</p>
           </div>
-          <AddShiftLauncher />
+          <AddShiftLauncher
+            userId={user.id}
+            isMobile={isMobile}
+            open={open}
+            onOpenChange={setOpen}
+            onSuccess={handleAddShiftSuccess}
+          />
         </div>
       </div>
 

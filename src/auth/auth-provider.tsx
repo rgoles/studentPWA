@@ -15,28 +15,42 @@ export interface AuthContextType {
   isSignedIn: boolean;
   isInitialLoading: boolean;
   user: User | null;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isSignedIn: false,
   isInitialLoading: true,
   user: null,
+  error: null,
 });
 
 export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check current session first
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        setIsSignedIn(true);
-      }
-      setIsInitialLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          setError(`Failed to get session: ${error.message}`);
+          setIsInitialLoading(false);
+          return;
+        }
+        
+        if (session?.user) {
+          setUser(session.user);
+          setIsSignedIn(true);
+        }
+        setIsInitialLoading(false);
+      })
+      .catch((err) => {
+        setError(`Session error: ${err.message}`);
+        setIsInitialLoading(false);
+      });
 
     // Subscribe to auth state changes
     const {
@@ -58,7 +72,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isSignedIn, isInitialLoading, user }}>
+    <AuthContext.Provider value={{ isSignedIn, isInitialLoading, user, error }}>
       {children}
     </AuthContext.Provider>
   );

@@ -11,12 +11,14 @@ export async function signUpNewUser(email: string, password: string) {
       emailRedirectTo: "https://example.com/welcome",
     },
   });
+  
   if (error) {
-    console.error("Login failed:", error.message);
-  } else {
-    console.log("Login successful:", data.user);
+    console.error("Signup failed:", error.message);
+    throw new Error(`Failed to sign up: ${error.message}`);
   }
-  return { data, error };
+  
+  console.log("Signup successful:", data.user);
+  return data;
 }
 
 export async function signInWithEmail(email: string, password: string) {
@@ -24,18 +26,23 @@ export async function signInWithEmail(email: string, password: string) {
     email: email,
     password: password,
   });
+  
   if (error) {
     console.error("Login failed:", error.message);
-  } else {
-    console.log("Login successful:", data.user);
+    throw new Error(`Failed to sign in: ${error.message}`);
   }
-  return { data, error };
+  
+  console.log("Login successful:", data.user);
+  return data;
 }
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
+  
   if (error) {
-    console.error("Signout failed");
+    console.error("Signout failed:", error.message);
+    throw new Error(`Failed to sign out: ${error.message}`);
   }
-  return error;
+  
+  return true; // Success
 }

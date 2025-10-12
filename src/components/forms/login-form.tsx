@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { signInWithEmail } from "@/auth/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { AuthError } from "@supabase/supabase-js";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { UserLoginSchema } from "@/lib/validation";
 import {
@@ -30,7 +29,6 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<AuthError | null>(null);
   const navigate = useNavigate({ from: "/login" });
 
   const form = useForm<z.infer<typeof UserLoginSchema>>({
@@ -43,14 +41,18 @@ export function LoginForm({
 
   const onSubmit: SubmitHandler<UserLoginType> = async (data) => {
     setIsLoading(true);
-    const { error } = await signInWithEmail(data.email, data.password);
-
-    if (!error) {
+    
+    try {
+      await signInWithEmail(data.email, data.password);
+      
+      // Success - navigate away
       await navigate({ to: "/about", replace: true });
-    } else {
-      setError(error);
+    } catch (err: any) {
+      form.setError("root", {
+        type: "manual",
+        message: err?.message ?? "Something went wrong"
+      });
       setIsLoading(false);
-      console.error(error);
     }
   };
 
@@ -121,6 +123,13 @@ export function LoginForm({
                       </FormItem>
                     )}
                   />{" "}
+                  {/* Show form errors */}
+                  {form.formState.errors.root && (
+                    <p className="text-sm text-red-600">
+                      {form.formState.errors.root.message}
+                    </p>
+                  )}
+
                   <Button
                     type="submit"
                     className="w-full"
@@ -141,17 +150,6 @@ export function LoginForm({
                 </div>
               </form>
             </Form>
-            {/* Global error summary */}
-            {error && (
-              <div
-                tabIndex={-1}
-                role="alert"
-                aria-live="assertive"
-                className="mt-4 text-center text-xs text-balance text-red-600"
-              >
-                {error.message}
-              </div>
-            )}
           </CardContent>
         </Card>
       </section>
