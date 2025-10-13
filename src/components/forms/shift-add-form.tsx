@@ -57,7 +57,6 @@ export const ShiftAddForm = ({
     setButtonState("loading");
 
     try {
-        
       const tempShift: Shift = {
         user_id: userId,
         start_shift: data.start_shift,
@@ -67,7 +66,8 @@ export const ShiftAddForm = ({
         ended_at_utc: new Date(),
       };
 
-      const { started_at_utc, ended_at_utc } = convertTimeToTimestamp(tempShift);
+      const { started_at_utc, ended_at_utc } =
+        convertTimeToTimestamp(tempShift);
 
       const payload: Shift = {
         user_id: userId,
@@ -77,16 +77,16 @@ export const ShiftAddForm = ({
 
       await add.mutateAsync(payload);
       setButtonState("success");
-      
+
       // Reset form after successful submission
       form.reset();
-      
+
       if (onSuccess) onSuccess();
       setTimeout(() => setButtonState("idle"), 1500);
     } catch (err: any) {
       form.setError("root", {
         type: "manual",
-        message: err?.message ?? "Something went wrong"
+        message: err?.message ?? "Something went wrong",
       });
       setButtonState("idle");
     }
@@ -174,6 +174,7 @@ export const ShiftAddForm = ({
                     onSelect={(date) => {
                       if (!date) return;
                       field.onChange(date);
+                      console.info(date);
                       setOpen(false);
                     }}
                   />
@@ -190,7 +191,11 @@ export const ShiftAddForm = ({
           </p>
         )}
 
-        <Button className="w-full" type="submit" disabled={buttonState === "loading"}>
+        <Button
+          className="w-full"
+          type="submit"
+          disabled={buttonState === "loading"}
+        >
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
               key={buttonState}

@@ -4,6 +4,7 @@ import {
   CalendarIcon,
   ClockIcon,
   DotsThreeOutlineVerticalIcon,
+  FunnelIcon,
 } from "@phosphor-icons/react";
 import { decimalToHours } from "@/lib/timeUtils";
 import {
@@ -24,7 +25,17 @@ import type { Shift } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { AddShiftLauncher } from "@/components/ui/add-shift-launcher";
 import { useAuth } from "@/auth";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { ChevronDownIcon } from "lucide-react";
+import { Calendar } from "../ui/calendar";
 
 export const ShiftsListScreen = () => {
   const { user } = useAuth();
@@ -32,28 +43,47 @@ export const ShiftsListScreen = () => {
   const { remove } = useWorkHoursMutations();
   const { refetch, shifts, error, isLoading } = useWorkHoursQuery();
 
+  const [shiftAddMenuOpen, setShiftAddMenuOpen] = useState(false);
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
-  const [open, setOpen] = useState(false);
 
   const items = (shifts as Shift[]) ?? [];
-  const calculatedTotalHours = useMemo(
-    () => items.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0),
-    [items],
-  );
+
+  const filteredShifts = useMemo(() => {
+    if (!shifts) return [];
+    const targetMonth = selectedMonth.getMonth();
+    return shifts.filter((arr: Shift) => {
+      const shiftMonth = new Date(arr.ended_at_utc).getMonth();
+      return shiftMonth === targetMonth;
+    });
+  }, [shifts, selectedMonth]);
+
+  const calculatedTotalHours = useMemo(() => {
+    const list = isFiltered ? filteredShifts : items;
+    return list.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0);
+  }, [isFiltered, filteredShifts, items]);
 
   const handleAddShiftSuccess = () => {
     void refetch();
-    setOpen(false);
+    setShiftAddMenuOpen(false);
   };
 
   if (error) return <div>Error: {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
   if (!user) return <p>You must login</p>;
 
+  const dateLabel = selectedMonth.toLocaleDateString("hr-HR", {
+    month: "numeric",
+    year: "numeric",
+  });
+
+  const displayedShifts = isFiltered ? filteredShifts : items;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 p-4">
-      {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full flex-row items-center justify-between gap-3">
           <div>
@@ -65,15 +95,55 @@ export const ShiftsListScreen = () => {
           <AddShiftLauncher
             userId={user.id}
             isMobile={isMobile}
-            open={open}
-            onOpenChange={setOpen}
+            open={shiftAddMenuOpen}
+            onOpenChange={setShiftAddMenuOpen}
             onSuccess={handleAddShiftSuccess}
           />
         </div>
       </div>
+      <div className="flex justify-end">
+        <Button
+          variant={isFiltered ? "secondary" : "default"}
+          onClick={() => setIsFiltered((prev) => !prev)}
+        >
+          <FunnelIcon />
+          {isFiltered ? "Show All" : "Filter by Month"}
+        </Button>
 
+        <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="justify-between font-normal">
+              <span>{dateLabel}</span>
+              <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={selectedMonth}
+              captionLayout="dropdown"
+              onSelect={(d) => {
+                if (!d) return;
+                setSelectedMonth(d);
+                setIsFiltered(true);
+                setMonthPickerOpen(false);
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      {displayedShifts.length > 0 && (
+        <Card className="bg-muted/30 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground text-sm">Total Hours:</span>
+            <span className="text-foreground font-mono text-lg font-semibold">
+              {decimalToHours(calculatedTotalHours)}
+            </span>
+          </div>
+        </Card>
+      )}
       <div className="space-y-3">
-        {items.length === 0 ? (
+        {displayedShifts.length === 0 ? (
           <Card className="p-6 text-center">
             <ClockIcon className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
             <p className="text-muted-foreground">
@@ -81,7 +151,7 @@ export const ShiftsListScreen = () => {
             </p>
           </Card>
         ) : (
-          items.map((shift) => (
+          displayedShifts.map((shift) => (
             <Card key={shift.id} className="hover:bg-accent/50 p-4">
               <div className="flex flex-row justify-between gap-3 sm:items-center">
                 <div className="flex flex-col gap-3 md:flex-1 md:flex-row">
@@ -203,17 +273,6 @@ export const ShiftsListScreen = () => {
             </div>
           </DialogContent>
         </Dialog>
-
-        {items.length > 0 && (
-          <Card className="bg-muted/30 p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">Total</span>
-              <span className="text-foreground font-mono text-lg font-semibold">
-                {decimalToHours(calculatedTotalHours)}
-              </span>
-            </div>
-          </Card>
-        )}
       </div>
     </div>
   );
