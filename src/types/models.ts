@@ -5,13 +5,12 @@ import type z from "zod";
 export type ShiftRecord = {
   id: number;
   user_id: string;
-  started_at_utc: string; // ISO string from DB
-  ended_at_utc: string;   // ISO string from DB
+  started_at_utc: string; 
+  ended_at_utc: string; 
   hours_worked?: number;
   // total_hours?: number | null;
 };
 
-// Application model - what we use in components
 export type Shift = {
   id?: number;
   user_id: string;

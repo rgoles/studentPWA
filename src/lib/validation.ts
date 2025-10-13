@@ -23,16 +23,4 @@ export const ShiftSchema = z.object({
   shift_date: z.date({
     error: "Please select a valid date",
   }),
-  // }).refine((data) => {
-  //   // Validate that end time is after start time
-  //   const [startHour, startMinute] = data.start_shift.split(':').map(Number);
-  //   const [endHour, endMinute] = data.end_shift.split(':').map(Number);
-
-  //   const startMinutes = startHour * 60 + startMinute;
-  //   const endMinutes = endHour * 60 + endMinute;
-
-  //   return endMinutes > startMinutes;
-  // }, {
-  //   message: "End time must be after start time",
-  //   path: ["end_shift"]
 });
