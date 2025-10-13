@@ -83,7 +83,7 @@ export const ShiftsListScreen = () => {
   const displayedShifts = isFiltered ? filteredShifts : items;
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-4 p-4">
+    <div className="mx-auto w-full max-w-6xl space-y-4 p-4">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full flex-row items-center justify-between gap-3">
           <div>
