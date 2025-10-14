@@ -124,7 +124,7 @@ export const ShiftsListScreen = () => {
           />
         </div>
       </div>
-      <div className="flex justify-between">
+      <div className="flex gap-1 justify-between">
         <Button
           variant={isFiltered ? "secondary" : "default"}
           onClick={() => setIsFiltered((prev) => !prev)}
