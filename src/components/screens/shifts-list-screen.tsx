@@ -20,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Shift } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { AddShiftLauncher } from "@/components/ui/add-shift-launcher";
@@ -64,7 +64,7 @@ export const ShiftsListScreen = () => {
     for (let i = 0; i < 12; i++) {
       months.push({
         value: i,
-        label: new Date(2000, i, 1).toLocaleString("default", {
+        label: new Date(2000, i, 1).toLocaleString("hr-HR", {
           month: "long",
         }),
       });
@@ -88,14 +88,11 @@ export const ShiftsListScreen = () => {
     return list.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0);
   }, [isFiltered, filteredShifts, items]);
 
+  // Pri dodavanju smjene ova funkcija refetcha smjene da ih odma prikaze na ekranu i zatvori drawer / modal
   const handleAddShiftSuccess = () => {
     void refetch();
     setShiftAddMenuOpen(false);
   };
-
-  useEffect(() => {
-    console.log("selectedMonth state ->", selectedMonth.toISOString());
-  }, [selectedMonth]);
 
   if (error) return <div>Error: {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
@@ -127,7 +124,7 @@ export const ShiftsListScreen = () => {
           />
         </div>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-between">
         <Button
           variant={isFiltered ? "secondary" : "default"}
           onClick={() => setIsFiltered((prev) => !prev)}
@@ -161,7 +158,6 @@ export const ShiftsListScreen = () => {
         <Select
           value={String(selectedMonth.getMonth())}
           onValueChange={(value) => {
-            console.log("picked month index:", value);
             const indexId = Number(value);
 
             const next = new Date(selectedMonth);
