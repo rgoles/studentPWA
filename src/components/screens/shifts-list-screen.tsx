@@ -20,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Shift } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { AddShiftLauncher } from "@/components/ui/add-shift-launcher";
@@ -33,9 +33,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { ChevronDownIcon } from "lucide-react";
-import { Calendar } from "../ui/calendar";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export const ShiftsListScreen = () => {
   const { user } = useAuth();
@@ -44,13 +51,28 @@ export const ShiftsListScreen = () => {
   const { refetch, shifts, error, isLoading } = useWorkHoursQuery();
 
   const [shiftAddMenuOpen, setShiftAddMenuOpen] = useState(false);
-  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  // const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
   const [isFiltered, setIsFiltered] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
   const items = (shifts as Shift[]) ?? [];
+
+  const getAllMonths = () => {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+      months.push({
+        value: i,
+        label: new Date(2000, i, 1).toLocaleString("default", {
+          month: "long",
+        }),
+      });
+    }
+    return months;
+  };
+
+  const months = getAllMonths();
 
   const filteredShifts = useMemo(() => {
     if (!shifts) return [];
@@ -71,14 +93,18 @@ export const ShiftsListScreen = () => {
     setShiftAddMenuOpen(false);
   };
 
+  useEffect(() => {
+    console.log("selectedMonth state ->", selectedMonth.toISOString());
+  }, [selectedMonth]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (isLoading || !shifts) return <div>Loading...</div>;
   if (!user) return <p>You must login</p>;
 
-  const dateLabel = selectedMonth.toLocaleDateString("hr-HR", {
-    month: "numeric",
-    year: "numeric",
-  });
+  // const dateLabel = selectedMonth.toLocaleDateString("hr-HR", {
+  //   month: "numeric",
+  //   year: "numeric",
+  // });
 
   const displayedShifts = isFiltered ? filteredShifts : items;
 
@@ -110,7 +136,7 @@ export const ShiftsListScreen = () => {
           {isFiltered ? "Show All" : "Filter by Month"}
         </Button>
 
-        <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
+        {/* <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="justify-between font-normal">
               <span>{dateLabel}</span>
@@ -130,7 +156,37 @@ export const ShiftsListScreen = () => {
               }}
             />
           </PopoverContent>
-        </Popover>
+        </Popover> */}
+
+        <Select
+          value={String(selectedMonth.getMonth())}
+          onValueChange={(value) => {
+            console.log("picked month index:", value);
+            const indexId = Number(value);
+
+            const next = new Date(selectedMonth);
+            next.setFullYear(new Date().getFullYear());
+            next.setMonth(indexId, 1);
+            next.setHours(0, 0, 0, 0);
+
+            setSelectedMonth(next);
+            setIsFiltered(true);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a month" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Months</SelectLabel>
+              {months.map((month) => (
+                <SelectItem key={month.value} value={String(month.value)}>
+                  {month.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
       {displayedShifts.length > 0 && (
         <Card className="bg-muted/30 p-4">
