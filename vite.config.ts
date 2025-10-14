@@ -20,9 +20,9 @@ export default defineConfig({
         enabled: true, // enables SW in `vite` dev server (helpful while building)
       },
       manifest: {
-        name: "My React App",
-        short_name: "ReactApp",
-        description: "A Vite + React PWA",
+        name: "student.com.hr",
+        short_name: "Studently",
+        description: "Aplikacija za studente",
         theme_color: "#0f172a",
         background_color: "#0f172a",
         display: "standalone",
