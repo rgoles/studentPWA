@@ -77,10 +77,16 @@ export const ShiftsListScreen = () => {
   const filteredShifts = useMemo(() => {
     if (!shifts) return [];
     const targetMonth = selectedMonth.getMonth();
-    return shifts.filter((arr: Shift) => {
-      const shiftMonth = new Date(arr.ended_at_utc).getMonth();
-      return shiftMonth === targetMonth;
-    });
+    return shifts
+      .filter((arr: Shift) => {
+        const shiftMonth = new Date(arr.ended_at_utc).getMonth();
+        return shiftMonth === targetMonth;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.ended_at_utc).getTime();
+        const dateB = new Date(b.ended_at_utc).getTime();
+        return dateA - dateB;
+      });
   }, [shifts, selectedMonth]);
 
   const calculatedTotalHours = useMemo(() => {
@@ -124,7 +130,7 @@ export const ShiftsListScreen = () => {
           />
         </div>
       </div>
-      <div className="flex gap-1 justify-between">
+      <div className="flex justify-between gap-1">
         <Button
           variant={isFiltered ? "secondary" : "default"}
           onClick={() => setIsFiltered((prev) => !prev)}
