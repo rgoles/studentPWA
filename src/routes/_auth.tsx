@@ -45,9 +45,9 @@ export function AuthLayout() {
   return (
     <PwaLayout
       items={[
-        { to: "/shifts/add", label: "New Shift", icon: CalendarIcon },
+        // { to: "/shifts/add", label: "New Shift", icon: CalendarIcon },
         { to: "/shifts/list", label: "Shift", icon: ListIcon },
-        { to: "/", label: "Unknown", icon: PlaceholderIcon },
+        // { to: "/", label: "Unknown", icon: PlaceholderIcon },
         { to: "/about", label: "Profile", icon: UserIcon },
       ]}
     >

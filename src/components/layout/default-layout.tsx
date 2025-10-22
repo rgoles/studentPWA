@@ -47,7 +47,7 @@ function BottomTabBar({
       className="bg-background/80 supports-[backdrop-filter]:bg-background/60 fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="mx-auto grid h-20 max-w-screen-md grid-cols-4 items-center justify-center">
+      <div className="mx-auto grid h-20 max-w-screen-md grid-cols-2 items-center justify-center">
         {items.map((item, idx) => (
           <TabItem key={idx} {...item} />
         ))}
