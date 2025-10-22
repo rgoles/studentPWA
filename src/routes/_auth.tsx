@@ -1,8 +1,6 @@
 import PwaLayout from "@/components/layout/default-layout";
 import {
-  CalendarIcon,
   ListIcon,
-  PlaceholderIcon,
   UserIcon,
 } from "@phosphor-icons/react";
 import {
