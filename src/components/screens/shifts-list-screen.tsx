@@ -51,7 +51,6 @@ export const ShiftsListScreen = () => {
   const { refetch, shifts, error, isLoading } = useWorkHoursQuery();
 
   const [shiftAddMenuOpen, setShiftAddMenuOpen] = useState(false);
-  // const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
   const [isFiltered, setIsFiltered] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
@@ -94,7 +93,6 @@ export const ShiftsListScreen = () => {
     return list.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0);
   }, [isFiltered, filteredShifts, items]);
 
-  // Pri dodavanju smjene ova funkcija refetcha smjene da ih odma prikaze na ekranu i zatvori drawer / modal
   const handleAddShiftSuccess = () => {
     void refetch();
     setShiftAddMenuOpen(false);
@@ -138,28 +136,6 @@ export const ShiftsListScreen = () => {
           <FunnelIcon />
           {isFiltered ? "Show All" : "Filter by Month"}
         </Button>
-
-        {/* <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="justify-between font-normal">
-              <span>{dateLabel}</span>
-              <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={selectedMonth}
-              captionLayout="dropdown"
-              onSelect={(d) => {
-                if (!d) return;
-                setSelectedMonth(d);
-                setIsFiltered(true);
-                setMonthPickerOpen(false);
-              }}
-            />
-          </PopoverContent>
-        </Popover> */}
 
         <Select
           value={String(selectedMonth.getMonth())}

@@ -83,11 +83,8 @@ function TabItem({
       >
         {({ isActive }) => (
           <>
-            <Icon className={`h-6 w-6 ${isActive ? "" : "opacity-80"}`} />
+            <Icon className={`h-6 w-6 ${isActive ? "" : "opacity-40"}`} />
             <span>{label}</span>
-            {isActive ? (
-              <span className="bg-foreground/80 absolute inset-x-4 bottom-0 h-0.5 rounded-full" />
-            ) : null}
           </>
         )}
       </Link>

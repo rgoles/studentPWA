@@ -25,27 +25,11 @@ export const Route = createFileRoute("/_auth")({
 });
 
 export function AuthLayout() {
-  // const router = useRouter();
-  // const navigate = Route.useNavigate();
-  // const auth = useAuth();
-
-  // istrazit kod
-  // const handleLogout = () => {
-  //   if (window.confirm('Are you sure you want to logout?')) {
-  //     auth.logout().then(() => {
-  //       router.invalidate().finally(() => {
-  //         navigate({ to: '/login' })
-  //       })
-  //     })
-  //   }
-  // }
 
   return (
     <PwaLayout
       items={[
-        // { to: "/shifts/add", label: "New Shift", icon: CalendarIcon },
         { to: "/shifts/list", label: "Shift", icon: ListIcon },
-        // { to: "/", label: "Unknown", icon: PlaceholderIcon },
         { to: "/about", label: "Profile", icon: UserIcon },
       ]}
     >
