@@ -52,7 +52,7 @@ export const ShiftsListScreen = () => {
 
   const [shiftAddMenuOpen, setShiftAddMenuOpen] = useState(false);
 
-  const [isFiltered, setIsFiltered] = useState(false);
+  const [isFiltered, setIsFiltered] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
