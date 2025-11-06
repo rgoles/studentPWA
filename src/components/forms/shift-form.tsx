@@ -146,7 +146,7 @@ export const ShiftForm = ({
   return (
     <Form {...form}>
       <form
-        className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
+        className="flex max-w-full flex-col gap-2.5 md:w-xs"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
         <FormField

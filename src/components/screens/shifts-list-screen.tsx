@@ -336,7 +336,7 @@ export const ShiftsListScreen = () => {
                   : null}
               </DialogDescription>
             </DialogHeader>
-            <div>
+            
               {selectedShiftEdit ? (
                 <ShiftForm
                   formMode="edit"
@@ -345,8 +345,6 @@ export const ShiftsListScreen = () => {
                   shiftData={selectedShiftEdit}
                 />
               ) : null}
-              <p>{JSON.stringify(selectedShiftEdit)}</p>
-            </div>
             <div className="flex justify-end gap-2">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
