@@ -43,6 +43,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { ShiftForm } from "../forms/shift-form";
 
 export const ShiftsListScreen = () => {
   const { user } = useAuth();
@@ -54,8 +64,12 @@ export const ShiftsListScreen = () => {
 
   const [isFiltered, setIsFiltered] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
-  const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
-
+  const [selectedShiftRemove, setSelectedShiftRemove] = useState<Shift | null>(
+    null,
+  );
+  const [selectedShiftEdit, setSelectedShiftEdit] = useState<Shift | null>(
+    null,
+  );
   const items = (shifts as Shift[]) ?? [];
 
   const getAllMonths = () => {
@@ -253,12 +267,20 @@ export const ShiftsListScreen = () => {
                     <DropdownMenuItem
                       onSelect={(e) => {
                         e.preventDefault();
-                        setSelectedShift(shift);
+                        setSelectedShiftRemove(shift);
                       }}
                     >
                       Delete
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setSelectedShiftEdit(shift);
+                        console.log(shift);
+                      }}
+                    >
+                      Edit
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -267,16 +289,16 @@ export const ShiftsListScreen = () => {
         )}
 
         <Dialog
-          open={!!selectedShift}
-          onOpenChange={(v) => !v && setSelectedShift(null)}
+          open={!!selectedShiftRemove}
+          onOpenChange={(v) => !v && setSelectedShiftRemove(null)}
         >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Delete this shift?</DialogTitle>
               <DialogDescription>
-                {selectedShift
+                {selectedShiftRemove
                   ? `This will permanently delete the shift from ${new Date(
-                      selectedShift.started_at_utc,
+                      selectedShiftRemove.started_at_utc,
                     ).toLocaleString("hr-HR")}.`
                   : null}
               </DialogDescription>
@@ -292,17 +314,61 @@ export const ShiftsListScreen = () => {
                 variant="destructive"
                 disabled={remove.isPending}
                 onClick={() => {
-                  if (!selectedShift?.id) return;
-                  remove.mutate(selectedShift.id, {
+                  if (!selectedShiftRemove?.id) return;
+                  remove.mutate(selectedShiftRemove.id, {
                     onSuccess: () => {
-                      setSelectedShift(null);
-                      refetch(); // or invalidate
+                      setSelectedShiftRemove(null);
+                      refetch();
                     },
                   });
                 }}
                 className="rounded px-3 py-1"
               >
                 {remove.isPending ? "Deleting..." : "Confirm"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={!!selectedShiftEdit}
+          onOpenChange={(v) => !v && setSelectedShiftEdit(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit shift</DialogTitle>
+              <DialogDescription>
+                {selectedShiftEdit
+                  ? `Do you want to edit this shift? ${new Date(
+                      selectedShiftEdit.started_at_utc,
+                    ).toLocaleString("hr-HR")}.`
+                  : null}
+              </DialogDescription>
+            </DialogHeader>
+            <div>
+              {selectedShiftEdit ? (
+                <ShiftForm
+                  formMode="edit"
+                  userId={selectedShiftEdit.user_id}
+                  onSuccess={() => setSelectedShiftEdit(null)}
+                  shiftData={selectedShiftEdit}
+                />
+              ) : null}
+              <p>{JSON.stringify(selectedShiftEdit)}</p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  Close
+                </Button>
+              </DialogClose>
+              <Button
+                variant="default"
+                disabled={remove.isPending}
+                onClick={() => {}}
+                className="rounded px-3 py-1"
+              >
+                {remove.isPending ? "Deleting..." : "Save"}
               </Button>
             </div>
           </DialogContent>

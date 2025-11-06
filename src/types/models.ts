@@ -5,10 +5,9 @@ import type z from "zod";
 export type ShiftRecord = {
   id: number;
   user_id: string;
-  started_at_utc: string; 
-  ended_at_utc: string; 
+  started_at_utc: string;
+  ended_at_utc: string;
   hours_worked?: number;
-  // total_hours?: number | null;
 };
 
 export type Shift = {
@@ -19,9 +18,9 @@ export type Shift = {
   hours_worked?: number;
   // total_hours?: number | null;
 
-  start_shift?: string;  
-  end_shift?: string;    
-  shift_date?: Date;     
+  start_shift?: string;
+  end_shift?: string;
+  shift_date?: Date;
 };
 
 export type UserLoginType = z.infer<typeof UserLoginSchema>;
