@@ -37,7 +37,7 @@ const Field = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
         ref={ref}
         aria-invalid={!!error}
         className={cn(
-          "text-secondary-foreground focus:placeholder:text-muted-foreground/60 block h-12 w-full rounded-md bg-neutral-100 px-3 pt-5 pb-2 text-md font-medium outline-none placeholder:text-transparent focus:bg-white focus:ring-2 focus:ring-emerald-500",
+          "text-secondary-foreground focus:placeholder:text-muted-foreground/60 text-md block h-12 w-full rounded-md bg-neutral-100 px-3 pt-5 pb-2 font-medium outline-none placeholder:text-transparent focus:bg-white focus:ring-2 focus:ring-emerald-500",
           className,
         )}
         {...props}
