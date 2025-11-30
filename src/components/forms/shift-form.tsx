@@ -26,9 +26,16 @@ import {
 import type { z } from "zod";
 
 const buttonCopy = {
-  idle: "Add Shift",
-  loading: "Loading...",
-  success: "Shift Added",
+  add: {
+    idle: "Add Shift",
+    loading: "Loading...",
+    success: "Shift Added",
+  },
+  edit: {
+    idle: "Edit Shift",
+    loading: "Loading...",
+    success: "Shift Edited",
+  },
 } as const;
 
 export const ShiftForm = ({
@@ -43,26 +50,10 @@ export const ShiftForm = ({
   shiftData?: Shift;
 }) => {
   const [buttonState, setButtonState] =
-    useState<keyof typeof buttonCopy>("idle");
+    useState<keyof (typeof buttonCopy)["add"]>("idle");
   const [open, setOpen] = useState(false);
 
   const { add, edit } = useWorkHoursMutations();
-
-  // const form = useForm<z.infer<typeof ShiftSchema>>({
-  //   resolver: zodResolver(ShiftSchema),
-  //   defaultValues:
-  //     formMode === "add"
-  //       ? {
-  //           start_shift: "07:00",
-  //           end_shift: "15:00",
-  //           shift_date: new Date(),
-  //         }
-  //       : {
-  //           start_shift: shiftData?.start_shift || "",
-  //           end_shift: shiftData?.end_shift || "",
-  //           shift_date: shiftData?.shift_date || new Date(),
-  //         },
-  // });
 
   const toTimeInput = (value: string | Date) => {
     const d = new Date(value);
@@ -146,7 +137,7 @@ export const ShiftForm = ({
   return (
     <Form {...form}>
       <form
-        className="flex max-w-full flex-col gap-2.5 md:w-xs"
+        className="flex max-w-full flex-col gap-2.5"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
         <FormField
@@ -199,6 +190,7 @@ export const ShiftForm = ({
                     <Button
                       variant="outline"
                       className="justify-between font-normal"
+                      type="button"
                     >
                       <span>{dateLabel}</span>
                       <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
@@ -246,7 +238,7 @@ export const ShiftForm = ({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 25, opacity: 0 }}
             >
-              {buttonCopy[buttonState]}
+              {buttonCopy[formMode][buttonState]}
             </motion.span>
           </AnimatePresence>
         </Button>

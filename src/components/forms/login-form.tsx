@@ -7,21 +7,13 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { signInWithEmail } from "@/auth/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { UserLoginSchema } from "@/lib/validation";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { Form } from "../ui/form";
+import { FormField } from "@/components/atoms/custom-input";
 import type { z } from "zod";
 import type { UserLoginType } from "@/types";
 export function LoginForm({
@@ -41,16 +33,16 @@ export function LoginForm({
 
   const onSubmit: SubmitHandler<UserLoginType> = async (data) => {
     setIsLoading(true);
-    
+
     try {
       await signInWithEmail(data.email, data.password);
-      
+
       // Success - navigate away
       await navigate({ to: "/about", replace: true });
     } catch (err: any) {
       form.setError("root", {
         type: "manual",
-        message: err?.message ?? "Something went wrong"
+        message: err?.message ?? "Something went wrong",
       });
       setIsLoading(false);
     }
@@ -76,80 +68,66 @@ export function LoginForm({
             <div aria-live="polite" role="status" className="sr-only">
               {isLoading ? "Logging in…" : ""}
             </div>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
-                <p id="login-help" className="sr-only">
-                  All fields are required.
-                </p>
+            {/* <Form {...form}> */}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <p id="login-help" className="sr-only">
+                All fields are required.
+              </p>
 
-                <div className="grid gap-6">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="john.smith@gmail.com"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Enter your email address.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />{" "}
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>Enter your password.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />{" "}
-                  {/* Show form errors */}
-                  {form.formState.errors.root && (
-                    <p className="text-sm text-red-600">
-                      {form.formState.errors.root.message}
-                    </p>
-                  )}
+              <div className="grid gap-6">
+                <FormField
+                  id="email"
+                  error={form.formState.errors.email?.message}
+                >
+                  <FormField.Label>Email</FormField.Label>
+                  <FormField.Field
+                    placeholder="john.smith@gmail.com"
+                    {...form.register("email")}
+                  />
+                  <p className="text-muted-foreground text-[0.8rem]">
+                    Enter your email address.
+                  </p>
+                  <FormField.Error />
+                </FormField>
 
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                    aria-disabled={isLoading}
-                  >
-                    {isLoading ? "Logging in..." : "Login"}
-                  </Button>
-                  <div className="text-center text-sm">
-                    Don&apos;t have an account?{" "}
-                    <Link
-                      to="/register"
-                      className="underline underline-offset-4"
-                    >
-                      Register
-                    </Link>
-                  </div>
+                <FormField
+                  id="password"
+                  error={form.formState.errors.password?.message}
+                >
+                  <FormField.Label>Password</FormField.Label>
+                  <FormField.Field
+                    type="password"
+                    placeholder="password"
+                    {...form.register("password")}
+                  />
+                  <p className="text-muted-foreground text-[0.8rem]">
+                    Enter your password.
+                  </p>
+                  <FormField.Error />
+                </FormField>
+                {/* Show form errors */}
+                {form.formState.errors.root && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                  aria-disabled={isLoading}
+                >
+                  {isLoading ? "Logging in..." : "Login"}
+                </Button>
+                <div className="text-center text-sm">
+                  Don&apos;t have an account?{" "}
+                  <Link to="/register" className="underline underline-offset-4">
+                    Register
+                  </Link>
                 </div>
-              </form>
-            </Form>
+              </div>
+            </form>
+            {/* </Form> */}
           </CardContent>
         </Card>
       </section>

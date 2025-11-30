@@ -23,7 +23,7 @@ import {
 import { useMemo, useState } from "react";
 import type { Shift } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
-import { AddShiftLauncher } from "@/components/ui/add-shift-launcher";
+import { AddShiftLauncher } from "@/components/molecules/add-shift-launcher";
 import { useAuth } from "@/auth";
 import {
   Dialog,
@@ -336,30 +336,30 @@ export const ShiftsListScreen = () => {
                   : null}
               </DialogDescription>
             </DialogHeader>
-            
-              {selectedShiftEdit ? (
-                <ShiftForm
-                  formMode="edit"
-                  userId={selectedShiftEdit.user_id}
-                  onSuccess={() => setSelectedShiftEdit(null)}
-                  shiftData={selectedShiftEdit}
-                />
-              ) : null}
-            <div className="flex justify-end gap-2">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Close
-                </Button>
-              </DialogClose>
-              <Button
-                variant="default"
-                disabled={remove.isPending}
-                onClick={() => {}}
-                className="rounded px-3 py-1"
-              >
-                {remove.isPending ? "Deleting..." : "Save"}
-              </Button>
-            </div>
+
+            {selectedShiftEdit ? (
+              <ShiftForm
+                formMode="edit"
+                userId={selectedShiftEdit.user_id}
+                onSuccess={() => setSelectedShiftEdit(null)}
+                shiftData={selectedShiftEdit}
+              />
+            ) : null}
+            {/*<div className="flex justify-end gap-2">*/}
+            {/*  <DialogClose asChild>*/}
+            {/*    <Button type="button" variant="secondary">*/}
+            {/*      Close*/}
+            {/*    </Button>*/}
+            {/*  </DialogClose>*/}
+            {/*  <Button*/}
+            {/*    variant="default"*/}
+            {/*    disabled={remove.isPending}*/}
+            {/*    onClick={() => {}}*/}
+            {/*    className="rounded px-3 py-1"*/}
+            {/*  >*/}
+            {/*    {remove.isPending ? "Deleting..." : "Save"}*/}
+            {/*  </Button>*/}
+            {/*</div>*/}
           </DialogContent>
         </Dialog>
       </div>
