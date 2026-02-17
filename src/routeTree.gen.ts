@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth.index'
 import { Route as AuthAboutRouteImport } from './routes/_auth.about'
 import { Route as AuthShiftsListRouteImport } from './routes/_auth.shifts/list'
+import { Route as AuthShiftsDashboardRouteImport } from './routes/_auth.shifts/dashboard'
 import { Route as AuthShiftsAddRouteImport } from './routes/_auth.shifts/add'
 
 const TestRoute = TestRouteImport.update({
@@ -52,6 +53,11 @@ const AuthShiftsListRoute = AuthShiftsListRouteImport.update({
   path: '/shifts/list',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthShiftsDashboardRoute = AuthShiftsDashboardRouteImport.update({
+  id: '/shifts/dashboard',
+  path: '/shifts/dashboard',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthShiftsAddRoute = AuthShiftsAddRouteImport.update({
   id: '/shifts/add',
   path: '/shifts/add',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AuthAboutRoute
   '/': typeof AuthIndexRoute
   '/shifts/add': typeof AuthShiftsAddRoute
+  '/shifts/dashboard': typeof AuthShiftsDashboardRoute
   '/shifts/list': typeof AuthShiftsListRoute
 }
 export interface FileRoutesByTo {
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/about': typeof AuthAboutRoute
   '/': typeof AuthIndexRoute
   '/shifts/add': typeof AuthShiftsAddRoute
+  '/shifts/dashboard': typeof AuthShiftsDashboardRoute
   '/shifts/list': typeof AuthShiftsListRoute
 }
 export interface FileRoutesById {
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/_auth/about': typeof AuthAboutRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/shifts/add': typeof AuthShiftsAddRoute
+  '/_auth/shifts/dashboard': typeof AuthShiftsDashboardRoute
   '/_auth/shifts/list': typeof AuthShiftsListRoute
 }
 export interface FileRouteTypes {
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/'
     | '/shifts/add'
+    | '/shifts/dashboard'
     | '/shifts/list'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/'
     | '/shifts/add'
+    | '/shifts/dashboard'
     | '/shifts/list'
   id:
     | '__root__'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/_auth/about'
     | '/_auth/'
     | '/_auth/shifts/add'
+    | '/_auth/shifts/dashboard'
     | '/_auth/shifts/list'
   fileRoutesById: FileRoutesById
 }
@@ -176,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthShiftsListRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/shifts/dashboard': {
+      id: '/_auth/shifts/dashboard'
+      path: '/shifts/dashboard'
+      fullPath: '/shifts/dashboard'
+      preLoaderRoute: typeof AuthShiftsDashboardRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/shifts/add': {
       id: '/_auth/shifts/add'
       path: '/shifts/add'
@@ -190,6 +209,7 @@ interface AuthRouteChildren {
   AuthAboutRoute: typeof AuthAboutRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthShiftsAddRoute: typeof AuthShiftsAddRoute
+  AuthShiftsDashboardRoute: typeof AuthShiftsDashboardRoute
   AuthShiftsListRoute: typeof AuthShiftsListRoute
 }
 
@@ -197,6 +217,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthAboutRoute: AuthAboutRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthShiftsAddRoute: AuthShiftsAddRoute,
+  AuthShiftsDashboardRoute: AuthShiftsDashboardRoute,
   AuthShiftsListRoute: AuthShiftsListRoute,
 }
 

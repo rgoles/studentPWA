@@ -17,7 +17,7 @@ export const Route = createFileRoute("/register")({
 function RouteComponent() {
   return (
     <div className="flex h-screen items-center justify-center">
-      <RegisterForm className="w-full max-w-md" />
+      <RegisterForm />
     </div>
   );
 }

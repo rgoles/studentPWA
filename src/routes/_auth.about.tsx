@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { Button } from "@/components/catalyst/button";
 import { signOut } from "@/auth/index";
 import { useAuth } from "@/auth";
 export const Route = createFileRoute("/_auth/about")({
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_auth/about")({
 function About() {
   const { user } = useAuth();
   if (!user) {
-    return <p>Login please</p>;
+    return <Navigate to="/login" />;
   }
 
   return (

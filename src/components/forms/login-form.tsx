@@ -1,24 +1,17 @@
 import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from "@/components/ui/card";
+import { Button } from "@/components/catalyst/button";
 import { signInWithEmail } from "@/auth/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { UserLoginSchema } from "@/lib/validation";
 import { FormField } from "@/components/atoms/custom-input";
 import type { z } from "zod";
 import type { UserLoginType } from "@/types";
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+import { Card } from "../molecules/card";
+import { GalleryVerticalEnd } from "lucide-react";
+
+export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate({ from: "/login" });
 
@@ -35,7 +28,6 @@ export function LoginForm({
 
     try {
       await signInWithEmail(data.email, data.password);
-
       // Success - navigate away
       await navigate({ to: "/about", replace: true });
     } catch (err: any) {
@@ -48,26 +40,26 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {/* Semantic landmark wrapping the card */}
-      <section aria-labelledby="login-title">
+    <>
+      <div className="m-2 flex h-svh flex-col items-center justify-center gap-8 md:m-0">
+        <a href="/" className="flex items-center gap-2 self-center font-medium">
+          <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+            <GalleryVerticalEnd className="size-4" />
+          </div>
+          student.com.hr{" "}
+        </a>
         <Card>
-          <CardHeader className="text-center">
-            {/* Real heading labels the section */}
-            <h1 id="login-title" className="text-xl">
-              Welcome back
-            </h1>
-            <CardDescription id="login-desc">
+          <Card.Header>
+            <h1 className="text-xl text-neutral-900">Welcome back</h1>
+            <p id="login-desc" className="text-sm text-neutral-500">
               Login with your account
-            </CardDescription>
-          </CardHeader>
+            </p>
+          </Card.Header>
 
-          <CardContent>
-            {/* live region for non-blocking status updates */}
+          <Card.Body>
             <div aria-live="polite" role="status" className="sr-only">
               {isLoading ? "Logging in…" : ""}
             </div>
-            {/* <Form {...form}> */}
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <p id="login-help" className="sr-only">
                 All fields are required.
@@ -83,7 +75,7 @@ export function LoginForm({
                     placeholder="john.smith@gmail.com"
                     {...form.register("email")}
                   />
-                  <p className="text-muted-foreground text-[0.8rem]">
+                  <p className="text-[0.8rem] text-neutral-500">
                     Enter your email address.
                   </p>
                   <FormField.Error />
@@ -99,20 +91,19 @@ export function LoginForm({
                     placeholder="password"
                     {...form.register("password")}
                   />
-                  <p className="text-muted-foreground text-[0.8rem]">
+                  <p className="text-[0.8rem] text-neutral-500">
                     Enter your password.
                   </p>
                   <FormField.Error />
                 </FormField>
-                {/* Show form errors */}
                 {form.formState.errors.root && (
                   <p className="text-sm text-red-600">
                     {form.formState.errors.root.message}
                   </p>
                 )}
                 <Button
+                  color="emerald"
                   type="submit"
-                  className="w-full"
                   disabled={isLoading}
                   aria-disabled={isLoading}
                 >
@@ -126,16 +117,16 @@ export function LoginForm({
                 </div>
               </div>
             </form>
-            {/* </Form> */}
-          </CardContent>
+          </Card.Body>
+          <Card.Footer>
+            <div className="*:[a]:hover:text-primary text-center text-xs text-balance text-neutral-500 *:[a]:underline *:[a]:underline-offset-4">
+              By clicking login, you agree to our{" "}
+              <a href="/terms">Terms of Service</a> and{" "}
+              <a href="/privacy">Privacy Policy</a>.
+            </div>
+          </Card.Footer>
         </Card>
-      </section>
-
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking login, you agree to our{" "}
-        <a href="/terms">Terms of Service</a> and{" "}
-        <a href="/privacy">Privacy Policy</a>.
       </div>
-    </div>
+    </>
   );
 }

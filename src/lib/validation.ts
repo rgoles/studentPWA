@@ -4,7 +4,7 @@ export const UserLoginSchema = z.object({
   email: z.email(),
   password: z
     .string()
-    .min(5, { message: "Password must be longer than 5 chars" }),
+    .min(5, { message: "Password must be longer than 5 characters" }),
 });
 
 export const ShiftSchema = z.object({

@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   error: null,
 });
 
-export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -33,14 +33,15 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   useEffect(() => {
     // Check current session first
-    supabase.auth.getSession()
+    supabase.auth
+      .getSession()
       .then(({ data: { session }, error }) => {
         if (error) {
           setError(`Failed to get session: ${error.message}`);
           setIsInitialLoading(false);
           return;
         }
-        
+
         if (session?.user) {
           setUser(session.user);
           setIsSignedIn(true);

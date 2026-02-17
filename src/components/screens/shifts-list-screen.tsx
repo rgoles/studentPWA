@@ -6,12 +6,12 @@ import {
   DotsThreeOutlineVerticalIcon,
   FunnelIcon,
 } from "@phosphor-icons/react";
-import { decimalToHours } from "@/lib/timeUtils";
+import { decimalToHoursString, getAllMonths } from "@/lib/timeUtils";
 import {
   useWorkHoursMutations,
   useWorkHoursQuery,
 } from "@/hooks/use-work-hours";
-import { Button } from "../ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,16 +34,10 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { ShiftForm } from "../forms/shift-form";
+import { Button } from "../catalyst/button";
+import { Field, Label } from "../catalyst/fieldset";
+import { Select } from "../catalyst/select";
 
 export const ShiftsListScreen = () => {
   const { user } = useAuth();
@@ -62,19 +56,6 @@ export const ShiftsListScreen = () => {
     null,
   );
   const items = (shifts as Shift[]) ?? [];
-
-  const getAllMonths = () => {
-    const months = [];
-    for (let i = 0; i < 12; i++) {
-      months.push({
-        value: i,
-        label: new Date(2000, i, 1).toLocaleString("hr-HR", {
-          month: "long",
-        }),
-      });
-    }
-    return months;
-  };
 
   const months = getAllMonths();
 
@@ -115,7 +96,7 @@ export const ShiftsListScreen = () => {
   const displayedShifts = isFiltered ? filteredShifts : items;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 p-4">
+    <div className="m-4 mx-auto w-full max-w-6xl space-y-4">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full flex-row items-center justify-between gap-3">
           <div>
@@ -133,50 +114,47 @@ export const ShiftsListScreen = () => {
           />
         </div>
       </div>
-      <div className="flex justify-between gap-1">
-        <Button
-          variant={isFiltered ? "secondary" : "default"}
-          onClick={() => setIsFiltered((prev) => !prev)}
-        >
-          <FunnelIcon />
-          {isFiltered ? "Show All" : "Filter by Month"}
-        </Button>
+      <div className="flex items-center justify-between gap-1">
+        <div>
+          <Button
+            color={isFiltered ? "dark" : "zinc"}
+            onClick={() => setIsFiltered((prev) => !prev)}
+          >
+            <FunnelIcon />
+            {isFiltered ? "Show All" : "Filter by Month"}
+          </Button>
+        </div>
+        <Field>
+          <Label>Select a month</Label>
+          <Select
+            name="months"
+            defaultValue={String(selectedMonth.getMonth())}
+            onChange={(e) => {
+              const indexId = Number(e.target.value);
 
-        <Select
-          value={String(selectedMonth.getMonth())}
-          onValueChange={(value) => {
-            const indexId = Number(value);
+              const next = new Date(selectedMonth);
+              next.setFullYear(new Date().getFullYear());
+              next.setMonth(indexId, 1);
+              next.setHours(0, 0, 0, 0);
 
-            const next = new Date(selectedMonth);
-            next.setFullYear(new Date().getFullYear());
-            next.setMonth(indexId, 1);
-            next.setHours(0, 0, 0, 0);
-
-            setSelectedMonth(next);
-            setIsFiltered(true);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a month" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Months</SelectLabel>
-              {months.map((month) => (
-                <SelectItem key={month.value} value={String(month.value)}>
-                  {month.label}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+              setSelectedMonth(next);
+              setIsFiltered(true);
+            }}
+          >
+            {months.map((month) => (
+              <option key={month.value} value={String(month.value)}>
+                {month.label.charAt(0).toUpperCase() + month.label.slice(1)}
+              </option>
+            ))}
+          </Select>
+        </Field>
       </div>
       {displayedShifts.length > 0 && (
         <Card className="bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground text-sm">Total Hours:</span>
             <span className="text-foreground font-mono text-lg font-semibold">
-              {decimalToHours(calculatedTotalHours)}
+              {decimalToHoursString(calculatedTotalHours)}
             </span>
           </div>
         </Card>
@@ -232,10 +210,11 @@ export const ShiftsListScreen = () => {
 
                   <div className="flex justify-start sm:justify-start">
                     <Badge
-                      variant="outline"
+                      variant="secondary"
                       className="w-full font-mono text-sm"
                     >
-                      {decimalToHours(shift.hours_worked ?? 0)} hours worked
+                      {decimalToHoursString(shift.hours_worked ?? 0)} hours
+                      worked
                     </Badge>
                   </div>
                 </div>
@@ -243,8 +222,7 @@ export const ShiftsListScreen = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="icon"
+                      color="dark"
                       aria-label="Open shift actions"
                       className="h-8 w-8"
                     >
@@ -297,12 +275,10 @@ export const ShiftsListScreen = () => {
 
             <div className="flex justify-end gap-2">
               <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Close
-                </Button>
+                <Button type="button">Close</Button>
               </DialogClose>
               <Button
-                variant="destructive"
+                color="red"
                 disabled={remove.isPending}
                 onClick={() => {
                   if (!selectedShiftRemove?.id) return;

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/catalyst/button";
 import {
   Dialog,
   DialogContent,
@@ -39,8 +39,9 @@ export function AddShiftLauncher({
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerTrigger asChild>
-          <Button size="icon" onClick={() => onOpenChange(true)}>
+          <Button className="items-center" onClick={() => onOpenChange(true)}>
             <PlusIcon />
+            New Shift
           </Button>
         </DrawerTrigger>
         <DrawerContent>
@@ -53,7 +54,7 @@ export function AddShiftLauncher({
           </div>
           <DrawerFooter className="mb-8 pt-2">
             <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button>Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
@@ -64,8 +65,9 @@ export function AddShiftLauncher({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size="icon" onClick={() => onOpenChange(true)}>
+        <Button className="items-center" onClick={() => onOpenChange(true)}>
           <PlusIcon />
+          New Shift
         </Button>
       </DialogTrigger>
       <DialogContent className="w-fit sm:max-w-[425px]">

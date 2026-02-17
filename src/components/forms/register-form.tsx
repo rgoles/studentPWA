@@ -1,13 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/catalyst/button";
 import { useState } from "react";
 import { signUpNewUser } from "@/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -16,15 +8,8 @@ import type z from "zod";
 import { UserLoginSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { UserLoginType } from "@/types";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { FormField } from "../atoms/custom-input";
+import { Card } from "../molecules/card";
 
 export function RegisterForm({
   className,
@@ -46,13 +31,13 @@ export function RegisterForm({
 
     try {
       await signUpNewUser(data.email, data.password);
-      
+
       // Success - navigate to login
       navigate({ to: "/login", replace: true });
     } catch (err: any) {
       form.setError("root", {
         type: "manual",
-        message: err?.message ?? "Something went wrong"
+        message: err?.message ?? "Something went wrong",
       });
       setIsLoading(false);
     }
@@ -61,76 +46,63 @@ export function RegisterForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
-          <CardTitle>Register to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to register to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="flex flex-col gap-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="john.smith@gmail.com" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Enter your email address.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />{" "}
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>Enter your password.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />{" "}
-                
-                {/* Show form errors */}
-                {form.formState.errors.root && (
-                  <p className="text-sm text-red-600">
-                    {form.formState.errors.root.message}
-                  </p>
-                )}
+        <Card.Header>
+          <h1 className="text-xl text-neutral-900">Welcome</h1>
+          <p className="text-sm text-neutral-500">Register your account</p>
+        </Card.Header>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Card.Body className="flex flex-col gap-6">
+            <FormField id="email" error={form.formState.errors.email?.message}>
+              <FormField.Label>Email</FormField.Label>
+              <FormField.Field
+                placeholder="john.smith@gmail.com"
+                {...form.register("email")}
+              />
+              <p className="text-muted-foreground text-[0.8rem]">
+                Enter your email address.
+              </p>
+              <FormField.Error />
+            </FormField>
 
-                <div className="flex flex-col gap-3">
-                  <Button type="submit" disabled={isLoading} className="w-full">
-                    {isLoading ? "Loading..." : "Register"}
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    Register with Google
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link to="/login" className="underline underline-offset-4">
-                  Login
-                </Link>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
+            <FormField
+              id="password"
+              error={form.formState.errors.password?.message}
+            >
+              <FormField.Label>Password</FormField.Label>
+              <FormField.Field
+                placeholder="john.smith@gmail.com"
+                {...form.register("password")}
+              />
+              <p className="text-muted-foreground text-[0.8rem]">
+                Enter your password.
+              </p>
+              <FormField.Error />
+            </FormField>
+            {form.formState.errors.root && (
+              <p className="text-sm text-red-600">
+                {form.formState.errors.root.message}
+              </p>
+            )}
+          </Card.Body>
+          <Card.Footer>
+            <div className="flex flex-col gap-3">
+              <Button
+                color="emerald"
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
+              >
+                {isLoading ? "Loading..." : "Register"}
+              </Button>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              Already have an account?{" "}
+              <Link to="/login" className="underline underline-offset-4">
+                Login
+              </Link>
+            </div>
+          </Card.Footer>
+        </form>
       </Card>
     </div>
   );

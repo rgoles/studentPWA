@@ -1,5 +1,15 @@
 import type { Shift } from "@/types";
 
+export const getCurrentDate = () => {
+  const now = new Date();
+  return {
+    day: now.getDate(),
+    month: now.getMonth(),
+    monthName: now.toLocaleString("hr-HR", { month: "long" }),
+    year: now.getFullYear(),
+  };
+};
+
 export const convertTimeToTimestamp = (shift: Shift) => {
   if (!shift.shift_date) throw new Error("Missing shift_date");
 
@@ -43,13 +53,37 @@ export const convertTimeToTimestamp = (shift: Shift) => {
   };
 };
 
-export const decimalToHours = (decimalHours: number): string => {
+// export const decimalToHours = (decimalHours: number): string => {
+//   const decimalPart = Math.round((decimalHours % 1) * 60);
+//   const hours = Math.floor(decimalHours);
+//   const finalNumber = [
+//     String(hours),
+//     ":",
+//     String(decimalPart).padStart(2, "0"),
+//   ];
+//   return finalNumber.join("");
+// };
+
+export const decimalHoursToMinutes = (decimalHours: number): number => {
+  return decimalHours * 60;
+};
+
+export const decimalToHoursString = (decimalHours: number): string => {
   const decimalPart = Math.round((decimalHours % 1) * 60);
   const hours = Math.floor(decimalHours);
-  const finalNumber = [
-    String(hours),
-    ":",
-    String(decimalPart).padStart(2, "0"),
-  ];
-  return finalNumber.join("");
+
+  return `${hours}:${String(decimalPart).padStart(2, "0")}`;
+};
+
+export const getAllMonths = () => {
+  const months = [];
+  for (let i = 0; i < 12; i++) {
+    months.push({
+      value: i,
+      label: new Date(2000, i, 1).toLocaleString("hr-HR", {
+        month: "long",
+      }),
+    });
+  }
+  return months;
 };
