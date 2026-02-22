@@ -8,11 +8,23 @@ import {
   decimalToHoursString,
   getCurrentDate,
 } from "@/lib/timeUtils.ts";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { AddShiftLauncher } from "@/components/molecules/add-shift-launcher.tsx";
+import { useAuth } from "@/auth";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 export const ShiftsDashboardScreen = () => {
+  const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const [shiftAddMenuOpen, setShiftAddMenuOpen] = useState(false);
+
   const { refetch, shifts, error, isLoading } = useWorkHoursQuery();
   const items = (shifts as Shift[]) ?? [];
+
+  const handleAddShiftSuccess = () => {
+    void refetch();
+    setShiftAddMenuOpen(false);
+  };
 
   const today = getCurrentDate();
 
@@ -35,6 +47,10 @@ export const ShiftsDashboardScreen = () => {
     const list = filteredShifts;
     return list.reduce((acc, s) => acc + Number(s.hours_worked ?? 0), 0);
   }, [filteredShifts, items]);
+
+  if (error) return <div>Error: {error.message}</div>;
+  if (isLoading || !shifts) return <div>Loading...</div>;
+  if (!user) return <p>You must login</p>;
 
   return (
     <div className="m-2 mx-auto w-full max-w-6xl space-y-6">
@@ -64,14 +80,18 @@ export const ShiftsDashboardScreen = () => {
           </div>
           <div className="col-span-4 flex flex-col text-sm">
             <p>Satnica</p>
-            <p className={"text-lg"}>6,56 $</p>
+            <p className={"text-lg"}>6,56 EUR/h</p>
           </div>
         </Card.Footer>
       </Card>
-      <Button color="emerald" className="w-full">
-        Add New Shift
-      </Button>
-      <div className="flex items-center justify-between">
+      <AddShiftLauncher
+        userId={user.id}
+        isMobile={isMobile}
+        open={shiftAddMenuOpen}
+        onOpenChange={setShiftAddMenuOpen}
+        onSuccess={handleAddShiftSuccess}
+      />
+      <div className="flex items-center justify-between font-medium">
         <p>Recent Shifts</p>
         <Button
           onClick={() => {
@@ -85,62 +105,68 @@ export const ShiftsDashboardScreen = () => {
       </div>
       <div className={"space-y-2"}>
         {filteredShifts.length > 0 ? (
-          filteredShifts.slice(0, 3).map((shift) => (
-            <Card
-              className={
-                "flex h-24 w-full flex-row items-center justify-between space-x-5 p-4"
-              }
-              key={shift.id}
-            >
-              <div
+          filteredShifts
+            .slice(-3)
+            .reverse()
+            .map((shift) => (
+              <Card
                 className={
-                  "flex flex-col place-content-center space-x-2 text-center"
+                  "flex h-24 w-full flex-row items-center justify-between space-x-5 p-4"
                 }
+                key={shift.id}
               >
-                <p>
-                  {new Date(shift.ended_at_utc).toLocaleDateString("hr-HR", {
-                    month: "short",
-                  })}
-                </p>
-                <p className={"text-lg font-medium"}>
-                  {new Date(shift.ended_at_utc).toLocaleDateString("hr-HR", {
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-              <div className={"flex flex-col place-content-center"}>
-                <p className={"text-sm font-medium"}>
-                  {new Date(shift.started_at_utc).toLocaleTimeString("hr-HR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  {" — "}
-                  {new Date(shift.ended_at_utc).toLocaleTimeString("hr-HR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                <p className={"text-sm"}>
-                  {decimalToHoursString(shift.hours_worked)} h rada
-                </p>
-              </div>
-              <div>
-                <p
-                  className={"text-center text-lg font-medium text-emerald-600"}
+                <div
+                  className={"flex flex-col place-content-center text-center"}
                 >
-                  +{" "}
-                  {new Intl.NumberFormat("hr-HR", {
-                    style: "currency",
-                    currency: "EUR",
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(
-                    (decimalHoursToMinutes(shift.hours_worked) / 60) * 6.56,
-                  )}
-                </p>
-              </div>
-            </Card>
-          ))
+                  <p>
+                    {new Date(shift.ended_at_utc).toLocaleDateString("hr-HR", {
+                      month: "short",
+                    })}
+                  </p>
+                  <p className={"text-lg font-medium"}>
+                    {new Date(shift.ended_at_utc).toLocaleDateString("hr-HR", {
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
+                <div className={"flex flex-col place-content-center"}>
+                  <p className={"text-sm font-medium"}>
+                    {new Date(shift.started_at_utc).toLocaleTimeString(
+                      "hr-HR",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      },
+                    )}
+                    {" — "}
+                    {new Date(shift.ended_at_utc).toLocaleTimeString("hr-HR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className={"text-sm"}>
+                    {decimalToHoursString(shift.hours_worked)} h rada
+                  </p>
+                </div>
+                <div>
+                  <p
+                    className={
+                      "text-center text-lg font-medium text-emerald-600"
+                    }
+                  >
+                    +{" "}
+                    {new Intl.NumberFormat("hr-HR", {
+                      style: "currency",
+                      currency: "EUR",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(
+                      (decimalHoursToMinutes(shift.hours_worked) / 60) * 6.56,
+                    )}
+                  </p>
+                </div>
+              </Card>
+            ))
         ) : (
           <div className="p-6 text-center"> the list is empty</div>
         )}{" "}

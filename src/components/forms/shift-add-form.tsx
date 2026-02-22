@@ -1,29 +1,16 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { ChevronDownIcon } from "lucide-react";
+import { Button } from "@/components/catalyst/button";
 import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 import { AnimatePresence, motion } from "motion/react";
 import type { Shift, ShiftFormType } from "@/types";
 import { convertTimeToTimestamp } from "@/lib/timeUtils";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ShiftSchema } from "@/lib/validation";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+
 import type { z } from "zod";
+import { FormField } from "@/components/atoms/custom-input.tsx";
+import { DatePickerField } from "@/components/atoms/date-picker-field.tsx";
 
 const buttonCopy = {
   idle: "Add Shift",
@@ -102,113 +89,68 @@ export const ShiftAddForm = ({
     : "Select date";
 
   return (
-    <Form {...form}>
-      <form
-        className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
-        onSubmit={form.handleSubmit(handleSubmit)}
+    <form
+      className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
+      onSubmit={form.handleSubmit(handleSubmit)}
+    >
+      <FormField
+        id="shiftStart"
+        error={form.formState.errors.start_shift?.message}
       >
-        <FormField
-          control={form.control}
-          name="start_shift"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shift Start</FormLabel>
-              <FormControl>
-                <Input
-                  type="time"
-                  placeholder="Shift Start"
-                  className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <FormField.Label>Start Shift</FormField.Label>
+        <FormField.Field
+          placeholder="Shift Start"
+          {...form.register("start_shift")}
         />
+        <p className="text-[0.8rem] text-neutral-500">Enter your shift start</p>
+        <FormField.Error />
+      </FormField>
 
-        <FormField
-          control={form.control}
-          name="end_shift"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shift End</FormLabel>
-              <FormControl>
-                <Input
-                  type="time"
-                  placeholder="Shift End"
-                  className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <FormField id="shiftEnd" error={form.formState.errors.end_shift?.message}>
+        <FormField.Label>End Shift</FormField.Label>
+        <FormField.Field
+          type="time"
+          
+          placeholder="End Start"
+          {...form.register("end_shift")}
         />
+        <p className="text-[0.8rem] text-neutral-500">Enter your shift end</p>
+        <FormField.Error />
+      </FormField>
 
-        <FormField
-          control={form.control}
-          name="shift_date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col space-y-2">
-              <FormLabel className="px-1">Datum kraja smjene</FormLabel>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      className="justify-between font-normal"
-                    >
-                      <span>{dateLabel}</span>
-                      <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-70" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto overflow-hidden p-0"
-                  align="start"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    captionLayout="dropdown"
-                    onSelect={(date) => {
-                      if (!date) return;
-                      field.onChange(date);
-                      console.info(date);
-                      setOpen(false);
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <DatePickerField
+        label="Datum kraja smjene"
+        value={form.watch("shift_date")}
+        onChange={(date) =>
+          form.setValue("shift_date", date, { shouldValidate: true })
+        }
+        error={form.formState.errors.shift_date?.message}
+      />
 
-        {form.formState.errors.root && (
-          <p className="text-sm text-red-600">
-            {form.formState.errors.root.message}
-          </p>
-        )}
+      {form.formState.errors.root && (
+        <p className="text-sm text-red-600">
+          {form.formState.errors.root.message}
+        </p>
+      )}
 
-        <Button
-          className="w-full"
-          type="submit"
-          disabled={buttonState === "loading"}
-        >
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span
-              key={buttonState}
-              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-              initial={{ y: -25, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 25, opacity: 0 }}
-            >
-              {buttonCopy[buttonState]}
-            </motion.span>
-          </AnimatePresence>
-        </Button>
-      </form>
-    </Form>
+      <Button
+        color={"emerald"}
+        className="w-full"
+        type="submit"
+        disabled={buttonState === "loading"}
+      >
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={buttonState}
+            transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+            initial={{ y: -25, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 25, opacity: 0 }}
+          >
+            {buttonCopy[buttonState]}
+          </motion.span>
+        </AnimatePresence>
+      </Button>
+    </form>
   );
 };

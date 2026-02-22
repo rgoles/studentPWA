@@ -17,7 +17,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { PlusIcon } from "@phosphor-icons/react";
 import { ShiftAddForm } from "@/components/forms/shift-add-form";
 
 interface AddShiftLauncherProps {
@@ -39,9 +38,12 @@ export function AddShiftLauncher({
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerTrigger asChild>
-          <Button className="items-center" onClick={() => onOpenChange(true)}>
-            <PlusIcon />
-            New Shift
+          <Button
+            className="w-full items-center"
+            color={"emerald"}
+            onClick={() => onOpenChange(true)}
+          >
+            Dodaj novu smjenu
           </Button>
         </DrawerTrigger>
         <DrawerContent>
@@ -65,9 +67,11 @@ export function AddShiftLauncher({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="items-center" onClick={() => onOpenChange(true)}>
-          <PlusIcon />
-          New Shift
+        <Button
+          className="w-full items-center"
+          onClick={() => onOpenChange(true)}
+        >
+          Dodaj novu smjenu
         </Button>
       </DialogTrigger>
       <DialogContent className="w-fit sm:max-w-[425px]">
