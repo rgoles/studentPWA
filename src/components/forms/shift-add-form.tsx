@@ -100,6 +100,8 @@ export const ShiftAddForm = ({
         <FormField.Label>Start Shift</FormField.Label>
         <FormField.Field
           placeholder="Shift Start"
+          type={"time"}
+          className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           {...form.register("start_shift")}
         />
         <p className="text-[0.8rem] text-neutral-500">Enter your shift start</p>
@@ -109,8 +111,8 @@ export const ShiftAddForm = ({
       <FormField id="shiftEnd" error={form.formState.errors.end_shift?.message}>
         <FormField.Label>End Shift</FormField.Label>
         <FormField.Field
+          className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           type="time"
-          
           placeholder="End Start"
           {...form.register("end_shift")}
         />

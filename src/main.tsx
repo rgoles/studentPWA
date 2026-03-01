@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AuthProvider, useAuth } from "./auth/auth-provider";
 import "./index.css";
 // Import the generated route tree

@@ -44,7 +44,13 @@ export function RegisterForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div
+      className={cn(
+        "m-2 flex h-svh w-full flex-col items-center justify-center gap-8 md:m-0",
+        className,
+      )}
+      {...props}
+    >
       <Card>
         <Card.Header>
           <h1 className="text-xl text-neutral-900">Welcome</h1>
