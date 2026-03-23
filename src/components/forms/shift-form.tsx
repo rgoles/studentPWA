@@ -12,7 +12,7 @@ import { useWorkHoursMutations } from "@/hooks/use-work-hours";
 import { AnimatePresence, motion } from "motion/react";
 import type { Shift, ShiftFormType } from "@/types";
 import { convertTimeToTimestamp } from "@/lib/timeUtils";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ShiftSchema } from "@/lib/validation";
 import {

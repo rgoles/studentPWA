@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/catalyst/button";
 import { useState } from "react";
 import { signUpNewUser } from "@/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -8,8 +7,8 @@ import type z from "zod";
 import { UserLoginSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { UserLoginType } from "@/types";
-import { FormField } from "../atoms/custom-input";
 import { Card } from "../molecules/card";
+import { Button, PasswordInput, TextInput } from "@mantine/core";
 
 export function RegisterForm({
   className,
@@ -58,32 +57,54 @@ export function RegisterForm({
         </Card.Header>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card.Body className="flex flex-col gap-6">
-            <FormField id="email" error={form.formState.errors.email?.message}>
-              <FormField.Label>Email</FormField.Label>
-              <FormField.Field
-                placeholder="john.smith@gmail.com"
-                {...form.register("email")}
-              />
-              <p className="text-muted-foreground text-[0.8rem]">
-                Enter your email address.
-              </p>
-              <FormField.Error />
-            </FormField>
+            <TextInput
+              id="email"
+              variant="filled"
+              size="md"
+              placeholder="john.doe@gmail.com"
+              label="Email"
+              description="Enter your email address."
+              {...form.register("email")}
+              error={form.formState.errors.email?.message}
+            />
 
-            <FormField
+            <PasswordInput
               id="password"
+              variant="filled"
+              size="md"
+              placeholder="*******"
+              label="Password"
+              description="Enter your password."
+              {...form.register("password")}
               error={form.formState.errors.password?.message}
-            >
-              <FormField.Label>Password</FormField.Label>
-              <FormField.Field
-                placeholder="john.smith@gmail.com"
-                {...form.register("password")}
-              />
-              <p className="text-muted-foreground text-[0.8rem]">
-                Enter your password.
-              </p>
-              <FormField.Error />
-            </FormField>
+            />
+
+            {/*<FormField id="email" error={form.formState.errors.email?.message}>*/}
+            {/*  <FormField.Label>Email</FormField.Label>*/}
+            {/*  <FormField.Field*/}
+            {/*    placeholder="john.smith@gmail.com"*/}
+            {/*    {...form.register("email")}*/}
+            {/*  />*/}
+            {/*  <p className="text-muted-foreground text-[0.8rem]">*/}
+            {/*    Enter your email address.*/}
+            {/*  </p>*/}
+            {/*  <FormField.Error />*/}
+            {/*</FormField>*/}
+
+            {/*<FormField*/}
+            {/*  id="password"*/}
+            {/*  error={form.formState.errors.password?.message}*/}
+            {/*>*/}
+            {/*  <FormField.Label>Password</FormField.Label>*/}
+            {/*  <FormField.Field*/}
+            {/*    placeholder="john.smith@gmail.com"*/}
+            {/*    {...form.register("password")}*/}
+            {/*  />*/}
+            {/*  <p className="text-muted-foreground text-[0.8rem]">*/}
+            {/*    Enter your password.*/}
+            {/*  </p>*/}
+            {/*  <FormField.Error />*/}
+            {/*</FormField>*/}
             {form.formState.errors.root && (
               <p className="text-sm text-red-600">
                 {form.formState.errors.root.message}
@@ -92,11 +113,14 @@ export function RegisterForm({
           </Card.Body>
           <Card.Footer>
             <div className="flex flex-col gap-3">
+
               <Button
-                color="emerald"
+                size="md"
                 type="submit"
                 disabled={isLoading}
-                className="w-full"
+                aria-disabled={isLoading}
+                variant="filled"
+                color="teal"
               >
                 {isLoading ? "Loading..." : "Register"}
               </Button>

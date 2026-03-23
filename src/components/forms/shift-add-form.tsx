@@ -7,6 +7,7 @@ import { convertTimeToTimestamp } from "@/lib/timeUtils";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ShiftSchema } from "@/lib/validation";
+import { TimeInput } from "@mantine/dates";
 
 import type { z } from "zod";
 import { FormField } from "@/components/atoms/custom-input.tsx";
@@ -93,7 +94,22 @@ export const ShiftAddForm = ({
       className="flex w-screen max-w-full flex-col gap-2.5 md:w-xs"
       onSubmit={form.handleSubmit(handleSubmit)}
     >
-      <FormField
+      <TimeInput
+        id="shiftStart"
+        label="Shift start"
+        description="Input description"
+        {...form.register("start_shift")}
+        error={form.formState.errors.start_shift?.message}
+      />
+      <TimeInput
+        id="shiftEnd"
+        label="Shift end"
+        description="Input description"
+        {...form.register("end_shift")}
+        error={form.formState.errors.end_shift?.message}
+      />
+
+      {/* <FormField
         id="shiftStart"
         error={form.formState.errors.start_shift?.message}
       >
@@ -106,9 +122,9 @@ export const ShiftAddForm = ({
         />
         <p className="text-[0.8rem] text-neutral-500">Enter your shift start</p>
         <FormField.Error />
-      </FormField>
+      </FormField> */}
 
-      <FormField id="shiftEnd" error={form.formState.errors.end_shift?.message}>
+      {/* <FormField id="shiftEnd" error={form.formState.errors.end_shift?.message}>
         <FormField.Label>End Shift</FormField.Label>
         <FormField.Field
           className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
@@ -118,7 +134,7 @@ export const ShiftAddForm = ({
         />
         <p className="text-[0.8rem] text-neutral-500">Enter your shift end</p>
         <FormField.Error />
-      </FormField>
+      </FormField> */}
 
       <DatePickerField
         label="Datum kraja smjene"
