@@ -113,14 +113,13 @@ export function RegisterForm({
           </Card.Body>
           <Card.Footer>
             <div className="flex flex-col gap-3">
-
               <Button
                 size="md"
                 type="submit"
                 disabled={isLoading}
                 aria-disabled={isLoading}
                 variant="filled"
-                color="teal"
+                color="blue.8"
               >
                 {isLoading ? "Loading..." : "Register"}
               </Button>

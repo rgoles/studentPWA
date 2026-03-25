@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import { MantineProvider } from "@mantine/core";
 import { AuthProvider, useAuth } from "./auth/auth-provider";
 import "./index.css";

@@ -1,4 +1,4 @@
-import { Button } from "@/components/catalyst/button";
+import { Button } from "@mantine/core";
 import {
   Dialog,
   DialogContent,
@@ -39,14 +39,17 @@ export function AddShiftLauncher({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerTrigger asChild>
           <Button
-            className="w-full items-center"
-            color={"emerald"}
+            size="md"
+            fullWidth
+            type="submit"
             onClick={() => onOpenChange(true)}
+            variant="filled"
+            color="teal"
           >
             Dodaj novu smjenu
           </Button>
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="mb-10 h-full">
           <DrawerHeader className="text-left">
             <DrawerTitle>Add shift</DrawerTitle>
             <DrawerDescription>Enter your shift details.</DrawerDescription>
@@ -54,9 +57,11 @@ export function AddShiftLauncher({
           <div className="mx-5">
             <ShiftAddForm userId={userId} onSuccess={onSuccess} />
           </div>
-          <DrawerFooter className="mb-8 pt-2">
+          <DrawerFooter className="mx-5 mt-2 px-0 pt-2">
             <DrawerClose asChild>
-              <Button>Cancel</Button>
+              <Button size="md" type="submit" variant="filled" color="red">
+                Cancel
+              </Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>

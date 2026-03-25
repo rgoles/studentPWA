@@ -1,29 +1,36 @@
-import { CaretRightIcon, TrendUpIcon } from "@phosphor-icons/react";
-import { Card } from "../molecules/card";
-import { Button } from "../catalyst/button";
+import {
+  CalendarDotsIcon,
+  CaretRightIcon,
+  ChartLineUpIcon,
+  ClockIcon,
+  DotIcon,
+} from "@phosphor-icons/react";
 import { useWorkHoursQuery } from "@/hooks/use-work-hours.ts";
 import type { Shift } from "@/types";
+import { Box, Button, Card, Text, Title } from "@mantine/core";
+
 import {
   decimalHoursToMinutes,
   decimalToHoursString,
   getCurrentDate,
 } from "@/lib/timeUtils.ts";
-import { useMemo, useState } from "react";
-import { AddShiftLauncher } from "@/components/molecules/add-shift-launcher.tsx";
+import { useMemo } from "react";
 import { useAuth } from "@/auth";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import { AddShiftDrawer } from "../organisms/add-shift-drawer";
+import { useDisclosure } from "@mantine/hooks";
 
 export const ShiftsDashboardScreen = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  const [shiftAddMenuOpen, setShiftAddMenuOpen] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const { refetch, shifts, error, isLoading } = useWorkHoursQuery();
   const items = (shifts as Shift[]) ?? [];
 
   const handleAddShiftSuccess = () => {
     void refetch();
-    setShiftAddMenuOpen(false);
+    close();
   };
 
   const today = getCurrentDate();
@@ -54,51 +61,83 @@ export const ShiftsDashboardScreen = () => {
 
   return (
     <div className="m-2 mx-auto w-full max-w-6xl space-y-6">
-      <h1 className={"text-4xl font-medium"}>
+      <Title component={"h1"} mb={25} c={"dark.8"}>
         {today.monthName} {today.year}
-      </h1>
-      <Card className={"bg-emerald-600 text-white"}>
-        <Card.Header className="flex flex-row items-center space-x-2">
-          <TrendUpIcon weight={"bold"} /> <span>Ovaj mjesec</span>
-        </Card.Header>
-        <Card.Body className={"text-3xl font-medium"}>
-          {new Intl.NumberFormat("hr-HR", {
-            style: "currency",
-            currency: "EUR",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(calculatedTotalHours * 6.56)}
-        </Card.Body>
-        <Card.Footer className="grid grid-cols-12">
-          <div className="col-span-4 flex flex-col text-sm">
-            <p>Odrađeni sati</p>
-            <p className={"text-lg"}>{calculatedTotalHours}</p>
-          </div>
-          <div className="col-span-4 flex flex-col text-sm">
-            <p>Smjene</p>
-            <p className={"text-lg"}>{filteredShifts.length}</p>
-          </div>
-          <div className="col-span-4 flex flex-col text-sm">
-            <p>Satnica</p>
-            <p className={"text-lg"}>6,56 EUR/h</p>
-          </div>
-        </Card.Footer>
+      </Title>
+      <Card
+        shadow="sm"
+        padding="xl"
+        radius={"md"}
+        withBorder
+        bg={"blue.8"}
+        c={"white"}
+        className={"mb-2.5 space-y-6"}
+      >
+        <header className={"space-y-1"}>
+          <p id="earnings-title" className="text-sm font-medium text-white">
+            MJESEČNA ZARADA
+          </p>
+          <p className="text-4xl font-bold">
+            {new Intl.NumberFormat("hr-HR", {
+              style: "currency",
+              currency: "EUR",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(calculatedTotalHours * 6.56)}
+          </p>
+        </header>
+        <footer className="flex items-center justify-start gap-2">
+          <Box
+            component={"div"}
+            bg={"blue.7"}
+            bd="1px solid blue.6"
+            className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium"
+          >
+            <ClockIcon size={16} />
+            <span>{calculatedTotalHours} sati</span>
+          </Box>
+          <Box
+            component={"div"}
+            bg={"blue.7"}
+            bd="1px solid blue.6"
+            className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium"
+          >
+            <ChartLineUpIcon size={16} />
+            <span>+16%</span>
+          </Box>
+        </footer>
       </Card>
-      <AddShiftLauncher
-        userId={user.id}
+      <Button
+        radius={"md"}
+        size="md"
+        type="submit"
+        disabled={isLoading}
+        aria-disabled={isLoading}
+        variant="filled"
+        color="blue.8"
+        onClick={open}
+        fullWidth
+      >
+        Open Drawer
+      </Button>
+      <AddShiftDrawer
         isMobile={isMobile}
-        open={shiftAddMenuOpen}
-        onOpenChange={setShiftAddMenuOpen}
+        userId={user.id}
+        opened={opened}
+        onClose={close}
         onSuccess={handleAddShiftSuccess}
       />
+
       <div className="flex items-center justify-between font-medium">
-        <p>Recent Shifts</p>
+        <Text>Recent Shifts</Text>
         <Button
           onClick={() => {
             console.log(filteredShifts);
           }}
-          plain
+          variant="filled"
           className="items-center"
+          color="blue.8"
+          radius={"md"}
         >
           See all <CaretRightIcon />
         </Button>
@@ -109,28 +148,43 @@ export const ShiftsDashboardScreen = () => {
             .slice(-3)
             .reverse()
             .map((shift) => (
-              <Card
-                className={
-                  "flex h-24 w-full flex-row items-center justify-between space-x-5 p-4"
-                }
-                key={shift.id}
-              >
-                <div
-                  className={"flex flex-col place-content-center text-center"}
-                >
-                  <p>
-                    {new Date(shift.ended_at_utc).toLocaleDateString("hr-HR", {
-                      month: "short",
-                    })}
-                  </p>
-                  <p className={"text-lg font-medium"}>
-                    {new Date(shift.ended_at_utc).toLocaleDateString("hr-HR", {
-                      day: "numeric",
-                    })}
-                  </p>
+              <Card key={shift.id} radius={"md"} withBorder>
+                <div className={"flex flex-row justify-between gap-3"}>
+                  <div className={"mb-2 flex items-center gap-1"}>
+                    <CalendarDotsIcon color={"#1864ab"} />
+                    <Text fw={"700"} c={"blue.8"} size={"sm"}>
+                      {new Date(shift.ended_at_utc).toLocaleDateString(
+                        "hr-HR",
+                        {
+                          month: "short",
+                        },
+                      )}
+                    </Text>
+                    <Text fw={"700"} c={"blue.8"} size={"sm"}>
+                      {new Date(shift.ended_at_utc).toLocaleDateString(
+                        "hr-HR",
+                        {
+                          day: "numeric",
+                        },
+                      )}
+                    </Text>
+                  </div>
+                  <div>
+                    <Text fw={"700"} c={"blue.8"} size={"sm"}>
+                      +{" "}
+                      {new Intl.NumberFormat("hr-HR", {
+                        style: "currency",
+                        currency: "EUR",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(
+                        (decimalHoursToMinutes(shift.hours_worked) / 60) * 6.56,
+                      )}
+                    </Text>
+                  </div>
                 </div>
-                <div className={"flex flex-col place-content-center"}>
-                  <p className={"text-sm font-medium"}>
+                <div className={"flex flex-row items-center"}>
+                  <Text fw={"600"} size={"sm"} c={"dark.4"}>
                     {new Date(shift.started_at_utc).toLocaleTimeString(
                       "hr-HR",
                       {
@@ -143,27 +197,11 @@ export const ShiftsDashboardScreen = () => {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
-                  </p>
-                  <p className={"text-sm"}>
-                    {decimalToHoursString(shift.hours_worked)} h rada
-                  </p>
-                </div>
-                <div>
-                  <p
-                    className={
-                      "text-center text-lg font-medium text-emerald-600"
-                    }
-                  >
-                    +{" "}
-                    {new Intl.NumberFormat("hr-HR", {
-                      style: "currency",
-                      currency: "EUR",
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }).format(
-                      (decimalHoursToMinutes(shift.hours_worked) / 60) * 6.56,
-                    )}
-                  </p>
+                  </Text>
+                  <DotIcon />
+                  <Text fw={"600"} size={"sm"} c={"dark.4"}>
+                    {decimalToHoursString(shift.hours_worked)}h rada
+                  </Text>
                 </div>
               </Card>
             ))

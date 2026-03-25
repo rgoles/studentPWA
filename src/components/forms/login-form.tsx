@@ -128,7 +128,7 @@ export function LoginForm() {
                   disabled={isLoading}
                   aria-disabled={isLoading}
                   variant="filled"
-                  color="teal"
+                  color="blue.8"
                 >
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
